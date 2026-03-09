@@ -191,6 +191,68 @@ input[type='range'] {
   color: var(--ink-soft);
 }
 
+.prism-controls {
+  margin-bottom: 0.65rem;
+}
+
+.mode-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.mode-btn {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 0.38rem 0.72rem;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.mode-btn.active {
+  border-color: rgba(15, 139, 141, 0.75);
+  background: rgba(15, 139, 141, 0.12);
+}
+
+.mode-description {
+  margin: 0.2rem 0 0.8rem;
+  color: var(--ink-soft);
+}
+
+.prism-canvas-wrap {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.prism-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.legend {
+  margin-top: 0.7rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.4rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  font-size: 0.88rem;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+}
+
 @keyframes rise-in {
   from {
     opacity: 0;

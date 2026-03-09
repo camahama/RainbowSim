@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MasterMenu } from './ui/components/MasterMenu';
 import { RefractionPanel } from './ui/components/RefractionPanel';
+import { PrismPanel } from './ui/components/PrismPanel';
 import type { SimulationId } from './app/registry';
 
 function App() {
@@ -20,9 +21,9 @@ function App() {
       <MasterMenu activeId={activeId} onPick={setActiveId} />
 
       <main className="workspace">
-        {activeId === 'refraction' ? (
-          <RefractionPanel />
-        ) : (
+        {activeId === 'refraction' ? <RefractionPanel /> : null}
+        {activeId === 'prism' ? <PrismPanel /> : null}
+        {activeId !== 'refraction' && activeId !== 'prism' ? (
           <section className="panel">
             <h2>Planned Component</h2>
             <p className="panel-lead">
@@ -30,7 +31,7 @@ function App() {
               into the shared architecture.
             </p>
           </section>
-        )}
+        ) : null}
       </main>
     </div>
   );

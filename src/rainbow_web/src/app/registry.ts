@@ -18,7 +18,7 @@ export const SIMULATIONS: SimulationMeta[] = [
     id: 'prism',
     title: 'Prism',
     subtitle: 'Dispersion through triangular medium',
-    status: 'planned',
+    status: 'ready',
   },
   {
     id: 'raytrace',
