@@ -84,6 +84,7 @@ export function PrismPanel() {
           {snapshot.rays.map((ray) => (
             <polyline
               key={ray.band.name}
+              className="additive-ray"
               points={pointsToSvg(ray.points)}
               fill="none"
               stroke={ray.band.color}

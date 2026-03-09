@@ -78,6 +78,7 @@ export function RaytracePanel() {
           {snapshot.segments.map((seg, index) => (
             <line
               key={`${index}-${seg.start.x.toFixed(2)}`}
+              className="additive-ray"
               x1={seg.start.x}
               y1={seg.start.y}
               x2={seg.end.x}

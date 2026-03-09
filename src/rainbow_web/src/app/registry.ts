@@ -30,7 +30,7 @@ export const SIMULATIONS: SimulationMeta[] = [
     id: 'droplet',
     title: 'Droplet',
     subtitle: 'Two-bounce rain droplet model',
-    status: 'planned',
+    status: 'ready',
   },
   {
     id: 'droplet2',

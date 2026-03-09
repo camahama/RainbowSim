@@ -230,6 +230,11 @@ input[type='range'] {
   width: 100%;
   height: auto;
   display: block;
+  isolation: isolate;
+}
+
+.additive-ray {
+  mix-blend-mode: screen;
 }
 
 .legend {
@@ -251,6 +256,30 @@ input[type='range'] {
   height: 14px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+.droplet-controls select {
+  margin-top: 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.35rem 0.45rem;
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--ink);
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.visibility-grid {
+  margin: 0.7rem 0 0.8rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.35rem;
+}
+
+.vis-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
 }
 
 @keyframes rise-in {
