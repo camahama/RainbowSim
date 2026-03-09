@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MasterMenu } from './ui/components/MasterMenu';
 import { RefractionPanel } from './ui/components/RefractionPanel';
 import { PrismPanel } from './ui/components/PrismPanel';
+import { RaytracePanel } from './ui/components/RaytracePanel';
 import type { SimulationId } from './app/registry';
 
 function App() {
@@ -23,7 +24,8 @@ function App() {
       <main className="workspace">
         {activeId === 'refraction' ? <RefractionPanel /> : null}
         {activeId === 'prism' ? <PrismPanel /> : null}
-        {activeId !== 'refraction' && activeId !== 'prism' ? (
+        {activeId === 'raytrace' ? <RaytracePanel /> : null}
+        {activeId !== 'refraction' && activeId !== 'prism' && activeId !== 'raytrace' ? (
           <section className="panel">
             <h2>Planned Component</h2>
             <p className="panel-lead">

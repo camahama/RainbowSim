@@ -24,7 +24,7 @@ export const SIMULATIONS: SimulationMeta[] = [
     id: 'raytrace',
     title: 'Raytrace',
     subtitle: 'Geometric ray path visualizer',
-    status: 'planned',
+    status: 'ready',
   },
   {
     id: 'droplet',
