@@ -4,6 +4,7 @@ import { RefractionPanel } from './ui/components/RefractionPanel';
 import { PrismPanel } from './ui/components/PrismPanel';
 import { RaytracePanel } from './ui/components/RaytracePanel';
 import { DropletPanel } from './ui/components/DropletPanel';
+import { Droplet2Panel } from './ui/components/Droplet2Panel';
 import type { SimulationId } from './app/registry';
 
 function App() {
@@ -27,7 +28,12 @@ function App() {
         {activeId === 'prism' ? <PrismPanel /> : null}
         {activeId === 'raytrace' ? <RaytracePanel /> : null}
         {activeId === 'droplet' ? <DropletPanel /> : null}
-        {activeId !== 'refraction' && activeId !== 'prism' && activeId !== 'raytrace' && activeId !== 'droplet' ? (
+        {activeId === 'droplet2' ? <Droplet2Panel /> : null}
+        {activeId !== 'refraction' &&
+        activeId !== 'prism' &&
+        activeId !== 'raytrace' &&
+        activeId !== 'droplet' &&
+        activeId !== 'droplet2' ? (
           <section className="panel">
             <h2>Planned Component</h2>
             <p className="panel-lead">

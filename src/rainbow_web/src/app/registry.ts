@@ -36,7 +36,7 @@ export const SIMULATIONS: SimulationMeta[] = [
     id: 'droplet2',
     title: 'Droplet 2',
     subtitle: 'Realistic droplet profile and highlights',
-    status: 'planned',
+    status: 'ready',
   },
   {
     id: 'rainbow',
