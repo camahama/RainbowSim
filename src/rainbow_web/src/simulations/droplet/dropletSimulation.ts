@@ -48,7 +48,7 @@ export class DropletSimulation {
       primaryU: new Array<number>(count).fill(uFromImpact(95, 170)),
       secondaryU: new Array<number>(count).fill(uFromImpact(95, 170)),
       radius: 170,
-      showPrimary: true,
+      showPrimary: false,
       showSecondary: false,
     };
   }
@@ -113,7 +113,7 @@ export class DropletSimulation {
     const lay: DropletLayout = {
       width: layout?.width ?? 1000,
       height: layout?.height ?? 560,
-      center: layout?.center ?? { x: 390, y: 280 },
+      center: layout?.center ?? { x: 240, y: 190 },
       radius: layout?.radius ?? this.state.radius,
     };
 

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { impactFromU, RAINBOW_BANDS } from '../../physics/droplet/engine';
+import { RAINBOW_BANDS } from '../../physics/droplet/engine';
 import { DropletSimulation } from '../../simulations/droplet/dropletSimulation';
 
 const sim = new DropletSimulation();
@@ -18,6 +18,7 @@ export function DropletPanel() {
   const [radius, setRadius] = useState<number>(initial.radius);
   const [primaryU, setPrimaryU] = useState<number[]>([...initial.primaryU]);
   const [secondaryU, setSecondaryU] = useState<number[]>([...initial.secondaryU]);
+  const [draggingHandle, setDraggingHandle] = useState<'primary' | 'secondary' | null>(null);
 
   const snapshot = useMemo(() => {
     for (let i = 0; i < visible.length; i += 1) {
@@ -36,128 +37,73 @@ export function DropletPanel() {
 
   const primaryImpactU = primaryU[focusedIndex];
   const secondaryImpactU = secondaryU[focusedIndex];
-  const primaryImpactPx = impactFromU(primaryImpactU, snapshot.layout.radius);
-  const secondaryImpactPx = impactFromU(secondaryImpactU, snapshot.layout.radius);
+
+  const pointerToScene = (evt: React.PointerEvent<SVGSVGElement | SVGCircleElement>) => {
+    const rect = evt.currentTarget.getBoundingClientRect();
+    const sx = 1000 / rect.width;
+    const sy = 560 / rect.height;
+    return {
+      x: (evt.clientX - rect.left) * sx,
+      y: (evt.clientY - rect.top) * sy,
+    };
+  };
+
+  const updateFromPointer = (evt: React.PointerEvent<SVGSVGElement>) => {
+    if (!draggingHandle) {
+      return;
+    }
+
+    const p = pointerToScene(evt);
+    const dxRaw = p.x - snapshot.layout.center.x;
+    const clampedPrimary = Math.max(-snapshot.layout.radius * 0.995, Math.min(-1e-3, dxRaw));
+    const clampedSecondary = Math.max(1e-3, Math.min(snapshot.layout.radius * 0.995, dxRaw));
+
+    if (draggingHandle === 'primary') {
+      const u = Math.max(0, Math.min(0.999, Math.abs(clampedPrimary) / (snapshot.layout.radius * 0.995)));
+      const next = [...primaryU];
+      next[focusedIndex] = u;
+      setPrimaryU(next);
+    } else {
+      const u = Math.max(0, Math.min(0.999, clampedSecondary / (snapshot.layout.radius * 0.995)));
+      const next = [...secondaryU];
+      next[focusedIndex] = u;
+      setSecondaryU(next);
+    }
+  };
 
   return (
     <section className="panel">
       <h2>Droplet Lab</h2>
-      <p className="panel-lead">Primary/secondary rainbow paths with wavelength-dependent refractive index.</p>
+      <p className="panel-lead">Drag left handle for primary beam and right handle for secondary beam.</p>
 
-      <div className="controls droplet-controls">
-        <div className="mode-row" role="group" aria-label="Ray families">
-          <button
-            type="button"
-            className={showPrimary ? 'mode-btn active' : 'mode-btn'}
-            onClick={() => setShowPrimary((v) => !v)}
-          >
-            Primary {showPrimary ? 'ON' : 'OFF'}
-          </button>
-          <button
-            type="button"
-            className={showSecondary ? 'mode-btn active' : 'mode-btn'}
-            onClick={() => setShowSecondary((v) => !v)}
-          >
-            Secondary {showSecondary ? 'ON' : 'OFF'}
-          </button>
-          <button
-            type="button"
-            className="mode-btn"
-            onClick={() => {
-              sim.optimizeImpacts();
-              const st = sim.getState();
-              setPrimaryU([...st.primaryU]);
-              setSecondaryU([...st.secondaryU]);
-              setShowPrimary(st.showPrimary);
-              setShowSecondary(st.showSecondary);
+      <div className="droplet-layout">
+        <div className="prism-canvas-wrap">
+          <svg
+            viewBox="0 0 1000 560"
+            className={draggingHandle ? 'prism-canvas drag-hidden-cursor' : 'prism-canvas'}
+            role="img"
+            aria-label="Droplet primary and secondary ray paths"
+            onPointerDown={(evt) => {
+              const p = pointerToScene(evt);
+              const side = p.x < snapshot.layout.center.x ? 'primary' : 'secondary';
+              setDraggingHandle(side);
+              if (side === 'primary') {
+                setShowPrimary(true);
+              } else {
+                setShowSecondary(true);
+              }
+              evt.currentTarget.setPointerCapture(evt.pointerId);
+              updateFromPointer(evt);
             }}
+            onPointerMove={(evt) => updateFromPointer(evt)}
+            onPointerUp={(evt) => {
+              if (evt.currentTarget.hasPointerCapture(evt.pointerId)) {
+                evt.currentTarget.releasePointerCapture(evt.pointerId);
+              }
+              setDraggingHandle(null);
+            }}
+            onPointerLeave={() => setDraggingHandle(null)}
           >
-            Optimize Angles
-          </button>
-        </div>
-
-        <label>
-          Focus color
-          <select
-            value={focusedIndex}
-            onChange={(e) => {
-              const idx = Number(e.target.value);
-              setFocusedIndex(idx);
-            }}
-          >
-            {RAINBOW_BANDS.map((band, idx) => (
-              <option key={band.name} value={idx}>
-                {band.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label>
-          Droplet radius: <strong>{radius.toFixed(0)} px</strong>
-          <input
-            type="range"
-            min={80}
-            max={240}
-            step={1}
-            value={radius}
-            onChange={(e) => setRadius(Number(e.target.value))}
-          />
-        </label>
-
-        <label>
-          Primary impact u: <strong>{primaryImpactU.toFixed(3)}</strong> ({primaryImpactPx.toFixed(1)} px)
-          <input
-            type="range"
-            min={0}
-            max={0.999}
-            step={0.001}
-            value={primaryImpactU}
-            onChange={(e) => {
-              const next = [...primaryU];
-              next[focusedIndex] = Number(e.target.value);
-              setPrimaryU(next);
-            }}
-          />
-        </label>
-
-        <label>
-          Secondary impact u: <strong>{secondaryImpactU.toFixed(3)}</strong> ({secondaryImpactPx.toFixed(1)} px)
-          <input
-            type="range"
-            min={0}
-            max={0.999}
-            step={0.001}
-            value={secondaryImpactU}
-            onChange={(e) => {
-              const next = [...secondaryU];
-              next[focusedIndex] = Number(e.target.value);
-              setSecondaryU(next);
-            }}
-          />
-        </label>
-      </div>
-
-      <div className="visibility-grid">
-        {RAINBOW_BANDS.map((band, idx) => (
-          <label key={band.name} className="vis-item">
-            <input
-              type="checkbox"
-              checked={visible[idx]}
-              onChange={(e) => {
-                const next = [...visible];
-                next[idx] = e.target.checked;
-                setVisible(next);
-              }}
-            />
-            <span className="swatch" style={{ backgroundColor: band.hex }} />
-            {band.name}
-          </label>
-        ))}
-      </div>
-
-      <div className="prism-canvas-wrap">
-        <svg viewBox="0 0 1000 560" className="prism-canvas" role="img" aria-label="Droplet primary and secondary ray paths">
           <rect x="0" y="0" width="1000" height="560" fill="#111720" />
           <circle
             cx={snapshot.layout.center.x}
@@ -204,7 +150,111 @@ export function DropletPanel() {
               </g>
             );
           })}
-        </svg>
+
+          <line
+            x1={snapshot.layout.center.x}
+            y1={snapshot.layout.center.y - snapshot.layout.radius - 8}
+            x2={snapshot.layout.center.x}
+            y2={snapshot.layout.center.y + snapshot.layout.radius + 8}
+            stroke="rgba(220,220,220,0.25)"
+            strokeDasharray="4 4"
+          />
+          </svg>
+        </div>
+
+        <aside className="droplet-controls-column">
+          <div className="mode-row" role="group" aria-label="Ray families">
+            <button
+              type="button"
+              className={showPrimary ? 'mode-btn active' : 'mode-btn'}
+              onClick={() => setShowPrimary((v) => !v)}
+            >
+              Primary {showPrimary ? 'ON' : 'OFF'}
+            </button>
+            <button
+              type="button"
+              className={showSecondary ? 'mode-btn active' : 'mode-btn'}
+              onClick={() => setShowSecondary((v) => !v)}
+            >
+              Secondary {showSecondary ? 'ON' : 'OFF'}
+            </button>
+            <button
+              type="button"
+              className="mode-btn"
+              onClick={() => {
+                sim.optimizeImpacts();
+                const st = sim.getState();
+                setPrimaryU([...st.primaryU]);
+                setSecondaryU([...st.secondaryU]);
+                setShowPrimary(st.showPrimary);
+                setShowSecondary(st.showSecondary);
+              }}
+            >
+              Optimize
+            </button>
+          </div>
+
+          <label>
+            Radius: <strong>{radius.toFixed(0)} px</strong>
+            <input
+              type="range"
+              min={80}
+              max={240}
+              step={1}
+              value={radius}
+              onChange={(e) => setRadius(Number(e.target.value))}
+            />
+          </label>
+
+          <div className="stats" style={{ marginTop: 0 }}>
+            <div>
+              <span>Primary u</span>
+              <strong>{primaryImpactU.toFixed(3)}</strong>
+            </div>
+            <div>
+              <span>Secondary u</span>
+              <strong>{secondaryImpactU.toFixed(3)}</strong>
+            </div>
+          </div>
+
+          <div className="droplet-color-list" role="group" aria-label="Color visibility and focus">
+            {RAINBOW_BANDS.map((band, idx) => (
+              <div key={band.name} className={focusedIndex === idx ? 'droplet-color-row active' : 'droplet-color-row'}>
+                <input
+                  className="droplet-checkbox"
+                  type="checkbox"
+                  checked={visible[idx]}
+                  onChange={(e) => {
+                    const next = [...visible];
+                    next[idx] = e.target.checked;
+                    setVisible(next);
+                    if (e.target.checked) {
+                      setFocusedIndex(idx);
+                    }
+                  }}
+                />
+                <span className="swatch" style={{ backgroundColor: band.hex }} />
+                <button
+                  type="button"
+                  className="droplet-color-name"
+                  onClick={() => {
+                    setFocusedIndex(idx);
+                    if (!visible[idx]) {
+                      const next = [...visible];
+                      next[idx] = true;
+                      setVisible(next);
+                    }
+                    if (!showPrimary && !showSecondary) {
+                      setShowPrimary(true);
+                    }
+                  }}
+                >
+                  {band.name}
+                </button>
+              </div>
+            ))}
+          </div>
+        </aside>
       </div>
 
       <div className="stats">

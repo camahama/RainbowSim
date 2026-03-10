@@ -1,30 +1,26 @@
 import type { SimulationId } from '../../app/registry';
-import { SIMULATIONS } from '../../app/registry';
+import { SIMULATION_IDS } from '../../app/registry';
+import { UI_TEXT } from '../../app/uiText';
 
 type MasterMenuProps = {
-  activeId: SimulationId;
+  activeId: SimulationId | null;
   onPick: (id: SimulationId) => void;
 };
 
 export function MasterMenu({ activeId, onPick }: MasterMenuProps) {
   return (
-    <section className="menu-grid" aria-label="Simulation menu">
-      {SIMULATIONS.map((sim) => {
-        const active = sim.id === activeId;
-        const disabled = sim.status !== 'ready';
-
+    <section className="menu-grid" aria-label={UI_TEXT.appSubtitle}>
+      {SIMULATION_IDS.map((id) => {
+        const active = id === activeId;
         return (
           <button
-            key={sim.id}
+            key={id}
             type="button"
             className={`menu-card ${active ? 'active' : ''}`}
-            onClick={() => !disabled && onPick(sim.id)}
-            disabled={disabled}
+            onClick={() => onPick(id)}
             aria-current={active ? 'true' : undefined}
           >
-            <span className="menu-title">{sim.title}</span>
-            <span className="menu-subtitle">{sim.subtitle}</span>
-            <span className={`badge ${sim.status}`}>{sim.status}</span>
+            {UI_TEXT.moduleButtons[id]}
           </button>
         );
       })}

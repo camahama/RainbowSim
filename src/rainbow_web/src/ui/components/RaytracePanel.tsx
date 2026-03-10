@@ -9,61 +9,55 @@ function intensityToOpacity(intensity: number): number {
 
 export function RaytracePanel() {
   const [sourceXOffset, setSourceXOffset] = useState(sim.getState().sourceXOffset);
-  const [maxDepth, setMaxDepth] = useState(sim.getState().maxDepth);
   const [radius, setRadius] = useState(sim.getState().radius);
+  const [dragging, setDragging] = useState(false);
 
   const snapshot = useMemo(() => {
     sim.setSourceXOffset(sourceXOffset);
-    sim.setMaxDepth(maxDepth);
     sim.setRadius(radius);
     return sim.compute();
-  }, [sourceXOffset, maxDepth, radius]);
+  }, [sourceXOffset, radius]);
+
+  const offsetFromPointer = (evt: React.PointerEvent<SVGElement>) => {
+    const rect = evt.currentTarget.getBoundingClientRect();
+    const x = ((evt.clientX - rect.left) / rect.width) * 1000;
+    return x - 500;
+  };
 
   return (
     <section className="panel">
       <h2>Raytrace Lab</h2>
-      <p className="panel-lead">Recursive Fresnel split in a droplet-like sphere (reflection + transmission).</p>
+      <p className="panel-lead">Grab and pull the beam source at the bottom to steer the rays.</p>
 
       <div className="controls">
-        <label>
-          Source offset X: <strong>{sourceXOffset.toFixed(0)} px</strong>
-          <input
-            type="range"
-            min={-420}
-            max={420}
-            step={1}
-            value={sourceXOffset}
-            onChange={(e) => setSourceXOffset(Number(e.target.value))}
-          />
-        </label>
-
-        <label>
-          Max recursion depth: <strong>{maxDepth}</strong>
-          <input
-            type="range"
-            min={2}
-            max={18}
-            step={1}
-            value={maxDepth}
-            onChange={(e) => setMaxDepth(Number(e.target.value))}
-          />
-        </label>
-
-        <label>
-          Droplet radius: <strong>{radius.toFixed(0)} px</strong>
-          <input
-            type="range"
-            min={80}
-            max={230}
-            step={1}
-            value={radius}
-            onChange={(e) => setRadius(Number(e.target.value))}
-          />
-        </label>
+        <p className="panel-lead" style={{ margin: 0 }}>Drag anywhere to pull the source beam.</p>
       </div>
 
-      <div className="prism-canvas-wrap">
-        <svg viewBox="0 0 1000 520" className="prism-canvas" role="img" aria-label="Recursive ray tracing in spherical drop">
+      <div className="prism-canvas-wrap raytrace-wrap">
+        <svg
+          viewBox="0 0 1000 520"
+          className={dragging ? 'prism-canvas drag-hidden-cursor' : 'prism-canvas'}
+          role="img"
+          aria-label="Recursive ray tracing in spherical drop"
+          onPointerDown={(e) => {
+            setDragging(true);
+            e.currentTarget.setPointerCapture(e.pointerId);
+            setSourceXOffset(offsetFromPointer(e));
+          }}
+          onPointerMove={(e) => {
+            if (!dragging) {
+              return;
+            }
+            setSourceXOffset(offsetFromPointer(e));
+          }}
+          onPointerUp={(e) => {
+            if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+              e.currentTarget.releasePointerCapture(e.pointerId);
+            }
+            setDragging(false);
+          }}
+          onPointerLeave={() => setDragging(false)}
+        >
           <rect x="0" y="0" width="1000" height="520" fill="#0a1017" />
 
           <circle
@@ -90,8 +84,35 @@ export function RaytracePanel() {
             />
           ))}
 
-          <circle cx={snapshot.source.x} cy={508} r={7} fill="#fff8cc" stroke="#ffffff" strokeWidth={1} />
+          <circle
+            cx={snapshot.source.x}
+            cy={508}
+            r={18}
+            fill="transparent"
+          />
+          <circle
+            cx={snapshot.source.x}
+            cy={508}
+            r={7}
+            fill="#fff8cc"
+            stroke="#ffffff"
+            strokeWidth={1}
+          />
         </svg>
+
+        <div className="raytrace-corner-control">
+          <label>
+            <span>Size {radius.toFixed(0)}</span>
+            <input
+              type="range"
+              min={80}
+              max={230}
+              step={1}
+              value={radius}
+              onChange={(e) => setRadius(Number(e.target.value))}
+            />
+          </label>
+        </div>
       </div>
     </section>
   );
