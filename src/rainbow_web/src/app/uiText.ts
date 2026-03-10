@@ -33,7 +33,7 @@ export const UI_TEXT = {
       colorSeparation: 'Color separation y-offset',
       modeDescriptions: {
         air: 'Vacuum/air mode: all colors travel at light speed, so continue together',
-        block_straight: 'Straight block: different colors travel at different speeds, but entry and exit faces are parallel, so direction mostly recovers',
+        block_straight: 'Straight block: light slows down, and different colors travel at different speeds, red is fastest',
         block_rotated: 'Rotated block: parallel faces still preserve overall direction, with path offsets',
         triangle: 'Triangular prism: non-parallel faces produce visible dispersion between colors',
       },
