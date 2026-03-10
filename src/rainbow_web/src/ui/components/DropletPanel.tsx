@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { RAINBOW_BANDS } from '../../physics/droplet/engine';
 import { DropletSimulation } from '../../simulations/droplet/dropletSimulation';
+import { UI_TEXT } from '../../app/uiText';
 
 const sim = new DropletSimulation();
 
@@ -9,6 +10,7 @@ function toPolyline(points: { x: number; y: number }[]): string {
 }
 
 export function DropletPanel() {
+  const text = UI_TEXT.modules.droplet;
   const initial = sim.getState();
 
   const [visible, setVisible] = useState<boolean[]>(initial.visible);
@@ -70,8 +72,8 @@ export function DropletPanel() {
 
   return (
     <section className="panel">
-      <h2>Droplet Lab</h2>
-      <p className="panel-lead">Drag left handle for primary beam and right handle for secondary beam.</p>
+      <h2>{text.title}</h2>
+      <p className="panel-lead">{text.lead}</p>
 
       <div className="droplet-layout">
         <div className="prism-canvas-wrap">
@@ -79,7 +81,7 @@ export function DropletPanel() {
             viewBox="0 0 1000 560"
             className={draggingHandle ? 'prism-canvas drag-hidden-cursor' : 'prism-canvas'}
             role="img"
-            aria-label="Droplet primary and secondary ray paths"
+            aria-label={text.canvasAria}
             onPointerDown={(evt) => {
               const p = pointerToScene(evt);
               const side = p.x < snapshot.layout.center.x ? 'primary' : 'secondary';
@@ -160,24 +162,24 @@ export function DropletPanel() {
         </div>
 
         <aside className="droplet-controls-column">
-          <div className="mode-row" role="group" aria-label="Ray families">
+          <div className="mode-row" role="group" aria-label={text.rayFamiliesAria}>
             <button
               type="button"
               className={showPrimary ? 'mode-btn active' : 'mode-btn'}
               onClick={() => setShowPrimary((v) => !v)}
             >
-              Primary {showPrimary ? 'ON' : 'OFF'}
+              {showPrimary ? text.primaryOn : text.primaryOff}
             </button>
             <button
               type="button"
               className={showSecondary ? 'mode-btn active' : 'mode-btn'}
               onClick={() => setShowSecondary((v) => !v)}
             >
-              Secondary {showSecondary ? 'ON' : 'OFF'}
+              {showSecondary ? text.secondaryOn : text.secondaryOff}
             </button>
           </div>
 
-          <div className="droplet-color-list" role="group" aria-label="Color visibility and focus">
+          <div className="droplet-color-list" role="group" aria-label={text.colorFocusAria}>
             {RAINBOW_BANDS.map((band, idx) => (
               <div key={band.name} className={focusedIndex === idx ? 'droplet-color-row active' : 'droplet-color-row'}>
                 <input
@@ -227,11 +229,11 @@ export function DropletPanel() {
               setShowSecondary(st.showSecondary);
             }}
           >
-            Optimal Angles
+            {text.optimalAngles}
           </button>
 
           <label>
-            Radius: <strong>{radius.toFixed(0)} px</strong>
+            {text.radius}: <strong>{radius.toFixed(0)} {text.pxSuffix}</strong>
             <input
               type="range"
               min={80}
@@ -246,19 +248,19 @@ export function DropletPanel() {
 
       <div className="stats">
         <div>
-          <span>Focused color</span>
+          <span>{text.focusedColor}</span>
           <strong>{RAINBOW_BANDS[focusedIndex].name}</strong>
         </div>
         <div>
-          <span>Primary deflection</span>
+          <span>{text.primaryDeflection}</span>
           <strong>
-            {snapshot.focusedPrimaryDeviation === null ? 'N/A' : `${snapshot.focusedPrimaryDeviation.toFixed(1)}°`}
+            {snapshot.focusedPrimaryDeviation === null ? text.notAvailable : `${snapshot.focusedPrimaryDeviation.toFixed(1)}°`}
           </strong>
         </div>
         <div>
-          <span>Secondary deflection</span>
+          <span>{text.secondaryDeflection}</span>
           <strong>
-            {snapshot.focusedSecondaryDeviation === null ? 'N/A' : `${snapshot.focusedSecondaryDeviation.toFixed(1)}°`}
+            {snapshot.focusedSecondaryDeviation === null ? text.notAvailable : `${snapshot.focusedSecondaryDeviation.toFixed(1)}°`}
           </strong>
         </div>
       </div>

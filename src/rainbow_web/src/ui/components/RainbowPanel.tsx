@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { RainbowSimulation, type RainbowDropSample } from '../../simulations/rainbow/rainbowSimulation';
+import { UI_TEXT } from '../../app/uiText';
 
 const sim = new RainbowSimulation();
 const W = 1000;
@@ -99,6 +100,7 @@ function previewFillColor(r: number, g: number, b: number, intensity: number): s
 }
 
 export function RainbowPanel() {
+  const text = UI_TEXT.modules.rainbow;
   const [ui, setUi] = useState(sim.uiState());
   const [isDragging, setIsDragging] = useState(false);
 
@@ -208,8 +210,8 @@ export function RainbowPanel() {
 
   return (
     <section className="panel">
-      <h2>Rainbow Field</h2>
-      <p className="panel-lead">Stochastic rain accumulation with observer-angle spectral mapping.</p>
+      <h2>{text.title}</h2>
+      <p className="panel-lead">{text.lead}</p>
 
       <div className="controls">
         <div className="mode-row">
@@ -221,7 +223,7 @@ export function RainbowPanel() {
               setUi(sim.uiState());
             }}
           >
-            {ui.simulating ? 'Stop Rain' : 'Start Rain'}
+            {ui.simulating ? text.stopRain : text.startRain}
           </button>
           <button
             type="button"
@@ -237,7 +239,7 @@ export function RainbowPanel() {
               setUi(sim.uiState());
             }}
           >
-            Clear
+            {text.clear}
           </button>
         </div>
       </div>
@@ -279,22 +281,22 @@ export function RainbowPanel() {
             setIsDragging(false);
             previewRef.current = null;
           }}
-          aria-label="Rainbow field accumulation"
+          aria-label={text.canvasAria}
         />
       </div>
 
       <div className="stats">
         <div>
-          <span>Drops</span>
+          <span>{text.drops}</span>
           <strong>{ui.totalPoints.toLocaleString()}</strong>
         </div>
         <div>
-          <span>Rate</span>
-          <strong>{ui.simulating ? Math.floor(ui.pointsPerFrame) : 0}/frame</strong>
+          <span>{text.rate}</span>
+          <strong>{ui.simulating ? Math.floor(ui.pointsPerFrame) : 0}{text.frameSuffix}</strong>
         </div>
         <div>
-          <span>Manual input</span>
-          <strong>Drag preview, release to stamp</strong>
+          <span>{text.manualInput}</span>
+          <strong>{text.manualHint}</strong>
         </div>
       </div>
     </section>

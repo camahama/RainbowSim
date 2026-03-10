@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { RaytraceSimulation } from '../../simulations/raytrace/raytraceSimulation';
+import { UI_TEXT } from '../../app/uiText';
 
 const sim = new RaytraceSimulation();
 
@@ -8,6 +9,7 @@ function intensityToOpacity(intensity: number): number {
 }
 
 export function RaytracePanel() {
+  const text = UI_TEXT.modules.raytrace;
   const [sourceXOffset, setSourceXOffset] = useState(sim.getState().sourceXOffset);
   const [radius, setRadius] = useState(sim.getState().radius);
   const [dragging, setDragging] = useState(false);
@@ -26,11 +28,11 @@ export function RaytracePanel() {
 
   return (
     <section className="panel">
-      <h2>Raytrace Lab</h2>
-      <p className="panel-lead">Grab and pull the beam source at the bottom to steer the rays.</p>
+      <h2>{text.title}</h2>
+      <p className="panel-lead">{text.lead}</p>
 
       <div className="controls">
-        <p className="panel-lead" style={{ margin: 0 }}>Drag anywhere to pull the source beam.</p>
+        <p className="panel-lead" style={{ margin: 0 }}>{text.dragHint}</p>
       </div>
 
       <div className="prism-canvas-wrap raytrace-wrap">
@@ -38,7 +40,7 @@ export function RaytracePanel() {
           viewBox="0 0 1000 520"
           className={dragging ? 'prism-canvas drag-hidden-cursor' : 'prism-canvas'}
           role="img"
-          aria-label="Recursive ray tracing in spherical drop"
+          aria-label={text.canvasAria}
           onPointerDown={(e) => {
             setDragging(true);
             e.currentTarget.setPointerCapture(e.pointerId);
@@ -102,7 +104,7 @@ export function RaytracePanel() {
 
         <div className="raytrace-corner-control">
           <label>
-            <span>Size {radius.toFixed(0)}</span>
+            <span>{text.size} {radius.toFixed(0)}</span>
             <input
               type="range"
               min={80}

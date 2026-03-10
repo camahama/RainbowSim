@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { UI_TEXT } from '../../app/uiText';
 
 const VIEW_W = 1000;
 const VIEW_H = 460;
@@ -35,6 +36,7 @@ function degToRad(deg: number): number {
 }
 
 export function RefractionPanel() {
+  const text = UI_TEXT.modules.refraction;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const lastTsRef = useRef<number | null>(null);
   const phaseRef = useRef(0);
@@ -213,8 +215,8 @@ export function RefractionPanel() {
 
   return (
     <section className="panel refraction-panel">
-      <h2>Refraction Lab</h2>
-      <p className="panel-lead">Plane wave from the left crossing a sloped interface. The graded field shows slower phase travel in denser medium.</p>
+      <h2>{text.title}</h2>
+      <p className="panel-lead">{text.lead}</p>
 
       <div className="prism-canvas-wrap refraction-wrap">
         <canvas
@@ -223,12 +225,12 @@ export function RefractionPanel() {
           width={VIEW_W}
           height={VIEW_H}
           role="img"
-          aria-label="Smooth wave refraction field with sloped interface"
+          aria-label={text.canvasAria}
         />
 
         <div className="refraction-corner-control">
           <label>
-            <span>Interface angle {fmt(interfaceAngleDeg, 1)}°</span>
+            <span>{text.interfaceAngle} {fmt(interfaceAngleDeg, 1)}°</span>
             <input
               type="range"
               min={0}
@@ -240,7 +242,7 @@ export function RefractionPanel() {
           </label>
 
           <label>
-            <span>Medium index n {fmt(n2, 2)}</span>
+            <span>{text.mediumIndex} {fmt(n2, 2)}</span>
             <input type="range" min={1} max={3} step={0.01} value={n2} onChange={(e) => setN2(Number(e.target.value))} />
           </label>
         </div>

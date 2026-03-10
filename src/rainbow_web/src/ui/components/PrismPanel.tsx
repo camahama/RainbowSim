@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { PrismSimulation } from '../../simulations/prism/prismSimulation';
 import type { PrismMode, Vec2 } from '../../physics/prism/engine';
+import { UI_TEXT } from '../../app/uiText';
 
 const sim = new PrismSimulation();
 
@@ -88,6 +89,7 @@ function totalTravelTime(points: Vec2[], speedAir: number, speedMedium: number, 
 }
 
 export function PrismPanel() {
+  const text = UI_TEXT.modules.prism;
   const [mode, setMode] = useState<PrismMode>(sim.getState().mode);
   const [incidentDeg, setIncidentDeg] = useState<number>(sim.getState().incidentDeg);
   const [colorSeparation, setColorSeparation] = useState<number>(sim.getState().colorSeparation);
@@ -119,7 +121,7 @@ export function PrismPanel() {
     return sim.compute();
   }, [mode, incidentDeg, colorSeparation]);
 
-  const description = sim.description();
+  const description = text.modeDescriptions[mode];
 
   const snapAngle = (value: number): number => {
     if (Math.abs(value) <= 0.5) {
@@ -147,11 +149,11 @@ export function PrismPanel() {
 
   return (
     <section className="panel prism-panel">
-      <h2>Prism Lab</h2>
-      <p className="panel-lead">Phase 2 component. Polygon ray tracing with wavelength-dependent indices.</p>
+      <h2>{text.title}</h2>
+      <p className="panel-lead">{text.lead}</p>
 
       <div className="controls prism-controls">
-        <div className="mode-row" role="group" aria-label="Prism mode">
+        <div className="mode-row" role="group" aria-label={text.modeGroupAria}>
           <button
             type="button"
             className="mode-btn"
@@ -161,7 +163,7 @@ export function PrismPanel() {
               setClockSec(0);
             }}
           >
-            Clear
+            {text.clear}
           </button>
           <button
             type="button"
@@ -174,7 +176,7 @@ export function PrismPanel() {
               setRunning(true);
             }}
           >
-            Air
+            {text.air}
           </button>
           <button
             type="button"
@@ -187,7 +189,7 @@ export function PrismPanel() {
               setRunning(true);
             }}
           >
-            Straight
+            {text.straight}
           </button>
           <button
             type="button"
@@ -200,7 +202,7 @@ export function PrismPanel() {
               setRunning(true);
             }}
           >
-            Rotated
+            {text.rotated}
           </button>
           <button
             type="button"
@@ -213,7 +215,7 @@ export function PrismPanel() {
               setRunning(true);
             }}
           >
-            Prism
+            {text.prism}
           </button>
         </div>
       </div>
@@ -221,7 +223,7 @@ export function PrismPanel() {
       <p className="mode-description">{description}</p>
 
       <div className="prism-canvas-wrap prism-wrap">
-        <svg viewBox="0 0 1000 460" className="prism-canvas" role="img" aria-label="Prism ray tracing visualization">
+        <svg viewBox="0 0 1000 460" className="prism-canvas" role="img" aria-label={text.canvasAria}>
           <rect x="0" y="0" width="1000" height="460" fill="#0a0f14" />
 
           {snapshot.polygon.length > 0 ? (
@@ -259,7 +261,7 @@ export function PrismPanel() {
 
         <div className="prism-corner-control">
           <label>
-            <span>Angle {incidentDeg.toFixed(1)}°</span>
+            <span>{text.angle} {incidentDeg.toFixed(1)}°</span>
             <input
               type="range"
               min={-15}
@@ -275,7 +277,7 @@ export function PrismPanel() {
             />
           </label>
           <label>
-            <span>Color separation {colorSeparation.toFixed(1)}</span>
+            <span>{text.colorSeparation} {colorSeparation.toFixed(1)}</span>
             <input
               type="range"
               min={0}
@@ -298,7 +300,7 @@ export function PrismPanel() {
           <div key={ray.band.name} className="legend-item">
             <span className="swatch" style={{ backgroundColor: ray.band.color }} />
             <span>
-              {ray.band.name} n={ray.band.n.toFixed(2)}
+              {ray.band.name} {text.legendNPrefix}{ray.band.n.toFixed(2)}
             </span>
           </div>
         ))}

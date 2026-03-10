@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { DROPLET2_BANDS } from '../../physics/droplet2/engine';
 import { Droplet2Simulation } from '../../simulations/droplet2/droplet2Simulation';
+import { UI_TEXT } from '../../app/uiText';
 
 const sim = new Droplet2Simulation();
 
@@ -37,6 +38,7 @@ function drawRay(
 }
 
 export function Droplet2Panel() {
+  const text = UI_TEXT.modules.droplet2;
   const [ui, setUi] = useState(sim.uiState());
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -142,8 +144,8 @@ export function Droplet2Panel() {
     return () => window.cancelAnimationFrame(raf.id);
   }, []);
 
-  const primaryLabel = ui.primaryVisible ? 'Primary: CLEAR' : 'Primary: START';
-  const secondaryLabel = ui.secondaryVisible ? 'Secondary: CLEAR' : 'Secondary: START';
+  const primaryLabel = ui.primaryVisible ? text.primaryClear : text.primaryStart;
+  const secondaryLabel = ui.secondaryVisible ? text.secondaryClear : text.secondaryStart;
   const resetPrimaryLayer = () => {
     clearCanvas(pTransRef.current);
     clearCanvas(pReflRef.current);
@@ -165,11 +167,11 @@ export function Droplet2Panel() {
 
   return (
     <section className="panel">
-      <h2>Droplet 2 Lab</h2>
-      <p className="panel-lead">Animated accumulation layers inspired by the legacy advanced droplet view.</p>
+      <h2>{text.title}</h2>
+      <p className="panel-lead">{text.lead}</p>
 
       <div className="controls">
-        <div className="mode-row" role="group" aria-label="Droplet2 controls">
+        <div className="mode-row" role="group" aria-label={text.controlsAria}>
           <button
             type="button"
             className={ui.primaryVisible ? 'mode-btn active' : 'mode-btn'}
@@ -201,12 +203,12 @@ export function Droplet2Panel() {
           className="prism-canvas"
           width={SCENE_W}
           height={SCENE_H}
-          aria-label="Animated droplet accumulation"
+          aria-label={text.canvasAria}
         />
 
         <div className="droplet2-corner-control">
           <label>
-            <span>Radius {ui.radius.toFixed(0)}</span>
+            <span>{text.radius} {ui.radius.toFixed(0)}</span>
             <input
               type="range"
               min={10}
