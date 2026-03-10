@@ -4,6 +4,7 @@ import {
   type PrismMode,
   type PrismSnapshot,
 } from '../../physics/prism/engine';
+import { UI_PARAMS } from '../../app/uiParams';
 
 export type PrismState = {
   mode: PrismMode;
@@ -27,11 +28,17 @@ export class PrismSimulation {
   }
 
   setIncidentDeg(incidentDeg: number): void {
-    this.state.incidentDeg = Math.max(-15, Math.min(15, incidentDeg));
+    this.state.incidentDeg = Math.max(
+      UI_PARAMS.prism.incidentDeg.min,
+      Math.min(UI_PARAMS.prism.incidentDeg.max, incidentDeg),
+    );
   }
 
   setColorSeparation(value: number): void {
-    this.state.colorSeparation = Math.max(0, Math.min(14, value));
+    this.state.colorSeparation = Math.max(
+      UI_PARAMS.prism.colorSeparation.min,
+      Math.min(UI_PARAMS.prism.colorSeparation.max, value),
+    );
   }
 
   getState(): PrismState {

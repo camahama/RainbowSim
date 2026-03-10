@@ -1,4 +1,5 @@
 import { buildLayerSlice, offsetSequence, type LayerRay, type Vec2 } from '../../physics/droplet2/engine';
+import { UI_PARAMS } from '../../app/uiParams';
 
 export type Droplet2State = {
   radius: number;
@@ -34,16 +35,17 @@ export type Droplet2UiState = {
 
 export class Droplet2Simulation {
   private state: Droplet2State;
-  private static readonly MAX_RADIUS = 60;
+  private static readonly MAX_RADIUS = UI_PARAMS.droplet2.maxRadius;
 
   constructor() {
+    const defaults = UI_PARAMS.droplet2.defaults;
     this.state = {
-      radius: 26,
-      center: { x: 500, y: 145 },
-      sceneWidth: 1000,
-      sceneHeight: 560,
-      step: 0.1,
-      raysPerTick: 1,
+      radius: defaults.radius,
+      center: { ...defaults.center },
+      sceneWidth: UI_PARAMS.droplet2.sceneWidth,
+      sceneHeight: UI_PARAMS.droplet2.sceneHeight,
+      step: defaults.step,
+      raysPerTick: defaults.raysPerTick,
       primaryVisible: false,
       secondaryVisible: false,
       primaryAnimating: false,
@@ -69,7 +71,10 @@ export class Droplet2Simulation {
   }
 
   setRadius(radius: number): void {
-    this.state.radius = Math.max(10, Math.min(60, radius));
+    this.state.radius = Math.max(
+      UI_PARAMS.droplet2.radiusRange.min,
+      Math.min(UI_PARAMS.droplet2.radiusRange.max, radius),
+    );
 
     // Keep user intent (which families are on) when radius changes, but rebuild traces.
     const keepPrimary = this.state.primaryVisible;
@@ -86,7 +91,10 @@ export class Droplet2Simulation {
   }
 
   setRaysPerTick(value: number): void {
-    this.state.raysPerTick = Math.max(1, Math.min(4, Math.round(value)));
+    this.state.raysPerTick = Math.max(
+      UI_PARAMS.droplet2.raysPerTickRange.min,
+      Math.min(UI_PARAMS.droplet2.raysPerTickRange.max, Math.round(value)),
+    );
   }
 
   private offsets(): number[] {

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { RainbowSimulation, type RainbowDropSample } from '../../simulations/rainbow/rainbowSimulation';
 import { UI_TEXT } from '../../app/uiText';
+import { UI_PARAMS } from '../../app/uiParams';
 
 const sim = new RainbowSimulation();
-const W = 1000;
-const H = 560;
+const W = UI_PARAMS.rainbow.canvasWidth;
+const H = UI_PARAMS.rainbow.canvasHeight;
 
 function drawBackground(ctx: CanvasRenderingContext2D): void {
   const sky = ctx.createLinearGradient(0, 0, 0, H * 0.62);

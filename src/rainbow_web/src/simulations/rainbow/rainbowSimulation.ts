@@ -1,4 +1,5 @@
 import { createRainbowView, rainbowPixelContribution, type RainbowView } from '../../physics/rainbow/engine';
+import { UI_PARAMS } from '../../app/uiParams';
 
 export type RainbowDrop = { x: number; y: number; color: string; intensity: number; radius: number };
 export type RainbowDropSample = RainbowDrop & { r: number; g: number; b: number };
@@ -12,9 +13,9 @@ export type RainbowUiState = {
 export class RainbowSimulation {
   private view: RainbowView;
   private simulating = false;
-  private pointsPerFrame = 100;
-  private readonly acceleration = 1.012;
-  private readonly maxPoints = 9000;
+  private pointsPerFrame: number = UI_PARAMS.rainbow.defaults.pointsPerFrame;
+  private readonly acceleration: number = UI_PARAMS.rainbow.defaults.acceleration;
+  private readonly maxPoints: number = UI_PARAMS.rainbow.defaults.maxPoints;
   private totalPoints = 0;
 
   constructor() {
@@ -43,14 +44,14 @@ export class RainbowSimulation {
 
   clear(): void {
     this.totalPoints = 0;
-    this.pointsPerFrame = 100;
+    this.pointsPerFrame = UI_PARAMS.rainbow.defaults.pointsPerFrame;
   }
 
   manualDrop(x: number, y: number, boost = false): RainbowDropSample | null {
     const c = rainbowPixelContribution(x, y, this.view, boost, { allowWeak: true });
     this.totalPoints += 1;
 
-    if (!c || c.intensity <= 0.0001) {
+    if (!c || c.intensity <= UI_PARAMS.rainbow.intensityThreshold) {
       return null;
     }
 
@@ -62,13 +63,13 @@ export class RainbowSimulation {
       b: c.b,
       color: c.color,
       intensity: c.intensity,
-      radius: boost ? 10.5 : 8.4,
+      radius: boost ? UI_PARAMS.rainbow.manualDropRadius.boosted : UI_PARAMS.rainbow.manualDropRadius.normal,
     };
   }
 
   previewDrop(x: number, y: number): RainbowDropSample {
     const c = rainbowPixelContribution(x, y, this.view, false, { allowWeak: true });
-    if (!c || c.intensity <= 0.0001) {
+    if (!c || c.intensity <= UI_PARAMS.rainbow.intensityThreshold) {
       return {
         x,
         y,
@@ -77,7 +78,7 @@ export class RainbowSimulation {
         b: 0,
         color: 'rgb(0, 0, 0)',
         intensity: 0,
-        radius: 8,
+        radius: UI_PARAMS.rainbow.previewRadius,
       };
     }
 
@@ -89,7 +90,7 @@ export class RainbowSimulation {
       b: c.b,
       color: c.color,
       intensity: c.intensity,
-      radius: 8,
+      radius: UI_PARAMS.rainbow.previewRadius,
     };
   }
 
@@ -106,7 +107,16 @@ export class RainbowSimulation {
       const y = Math.random() * this.view.config.height;
       const c = rainbowPixelContribution(x, y, this.view, false);
       if (c) {
-        out.push({ x, y, r: c.r, g: c.g, b: c.b, color: c.color, intensity: c.intensity, radius: 1.35 });
+        out.push({
+          x,
+          y,
+          r: c.r,
+          g: c.g,
+          b: c.b,
+          color: c.color,
+          intensity: c.intensity,
+          radius: UI_PARAMS.rainbow.rainDropRadius,
+        });
       }
     }
 

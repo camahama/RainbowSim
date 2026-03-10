@@ -6,6 +6,7 @@ import {
   type DropletRayResult,
   type Vec2,
 } from '../../physics/droplet/engine';
+import { UI_PARAMS } from '../../app/uiParams';
 
 export type DropletState = {
   visible: boolean[];
@@ -42,8 +43,8 @@ export class DropletSimulation {
 
   constructor() {
     const count = RAINBOW_BANDS.length;
-    const defaultRadius = 100;
-    const defaultImpact = 56;
+    const defaultRadius = UI_PARAMS.droplet.defaults.radius;
+    const defaultImpact = UI_PARAMS.droplet.defaults.impact;
     this.state = {
       visible: new Array<boolean>(count).fill(false),
       focusedIndex: 0,
@@ -89,7 +90,10 @@ export class DropletSimulation {
   }
 
   setRadius(value: number): void {
-    this.state.radius = Math.max(80, Math.min(240, value));
+    this.state.radius = Math.max(
+      UI_PARAMS.droplet.radiusRange.min,
+      Math.min(UI_PARAMS.droplet.radiusRange.max, value),
+    );
   }
 
   optimizeImpacts(): void {
@@ -113,9 +117,9 @@ export class DropletSimulation {
 
   compute(layout?: Partial<DropletLayout>): DropletSnapshot {
     const lay: DropletLayout = {
-      width: layout?.width ?? 1000,
-      height: layout?.height ?? 560,
-      center: layout?.center ?? { x: 240, y: 190 },
+      width: layout?.width ?? UI_PARAMS.droplet.layoutDefaults.width,
+      height: layout?.height ?? UI_PARAMS.droplet.layoutDefaults.height,
+      center: layout?.center ?? { ...UI_PARAMS.droplet.layoutDefaults.center },
       radius: layout?.radius ?? this.state.radius,
     };
 

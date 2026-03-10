@@ -1,0 +1,75 @@
+export const UI_PARAMS = {
+  refraction: {
+    viewWidth: 1000,
+    viewHeight: 460,
+    baseWavelength: 30,
+    omega: 2.8,
+    beamSigma: 52,
+    sampleWidth: 500,
+    sampleHeight: 230,
+    normalHalfLen: 60,
+    directionMarkerLen: 82,
+  },
+  prism: {
+    raceBaseSpeed: 250,
+    mediumSlowdownFactor: 0.75,
+    angleSnapDeg: 0.5,
+    raceLoopTailSec: 0.8,
+    incidentDeg: { min: -15, max: 15, step: 0.5 },
+    colorSeparation: { min: 0, max: 14, step: 0.5 },
+  },
+  raytrace: {
+    defaults: {
+      sourceXOffset: -180,
+      maxDepth: 12,
+      minIntensity: 0.001,
+      radius: 180,
+      nAir: 1,
+      nWater: 1.333,
+    },
+    sourceXOffsetRange: { min: -420, max: 420 },
+    maxDepthRange: { min: 2, max: 18 },
+    radiusRange: { min: 80, max: 230 },
+  },
+  droplet: {
+    defaults: {
+      radius: 100,
+      impact: 56,
+    },
+    radiusRange: { min: 80, max: 240 },
+    layoutDefaults: {
+      width: 1000,
+      height: 560,
+      center: { x: 240, y: 190 },
+    },
+  },
+  droplet2: {
+    sceneWidth: 1000,
+    sceneHeight: 560,
+    maxRadius: 60,
+    radiusRange: { min: 10, max: 60 },
+    raysPerTickRange: { min: 1, max: 4 },
+    defaults: {
+      radius: 26,
+      center: { x: 500, y: 145 },
+      step: 0.1,
+      raysPerTick: 1,
+    },
+  },
+  rainbow: {
+    canvasWidth: 1000,
+    canvasHeight: 560,
+    defaults: {
+      pointsPerFrame: 100,
+      acceleration: 1.012,
+      maxPoints: 9000,
+    },
+    intensityThreshold: 0.0001,
+    manualDropRadius: {
+      normal: 8.4,
+      boosted: 10.5,
+    },
+    previewRadius: 8,
+    rainDropRadius: 1.35,
+  },
+} as const;

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { RAINBOW_BANDS } from '../../physics/droplet/engine';
 import { DropletSimulation } from '../../simulations/droplet/dropletSimulation';
 import { UI_TEXT } from '../../app/uiText';
+import { UI_PARAMS } from '../../app/uiParams';
 
 const sim = new DropletSimulation();
 
@@ -39,8 +40,8 @@ export function DropletPanel() {
 
   const pointerToScene = (evt: React.PointerEvent<SVGSVGElement | SVGCircleElement>) => {
     const rect = evt.currentTarget.getBoundingClientRect();
-    const sx = 1000 / rect.width;
-    const sy = 560 / rect.height;
+    const sx = UI_PARAMS.droplet.layoutDefaults.width / rect.width;
+    const sy = UI_PARAMS.droplet.layoutDefaults.height / rect.height;
     return {
       x: (evt.clientX - rect.left) * sx,
       y: (evt.clientY - rect.top) * sy,
@@ -236,8 +237,8 @@ export function DropletPanel() {
             {text.radius}: <strong>{radius.toFixed(0)} {text.pxSuffix}</strong>
             <input
               type="range"
-              min={80}
-              max={240}
+              min={UI_PARAMS.droplet.radiusRange.min}
+              max={UI_PARAMS.droplet.radiusRange.max}
               step={1}
               value={radius}
               onChange={(e) => setRadius(Number(e.target.value))}

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { PrismSimulation } from '../../simulations/prism/prismSimulation';
 import type { PrismMode, Vec2 } from '../../physics/prism/engine';
 import { UI_TEXT } from '../../app/uiText';
+import { UI_PARAMS } from '../../app/uiParams';
 
 const sim = new PrismSimulation();
 
@@ -125,18 +126,18 @@ export function PrismPanel() {
   const description = text.modeDescriptions[mode];
 
   const snapAngle = (value: number): number => {
-    if (Math.abs(value) <= 0.5) {
+    if (Math.abs(value) <= UI_PARAMS.prism.angleSnapDeg) {
       return 0;
     }
     return value;
   };
 
-  const baseSpeed = 250;
+  const baseSpeed = UI_PARAMS.prism.raceBaseSpeed;
   const mediumSpeedForBand = (n: number): number => {
     if (mode === 'air') {
       return baseSpeed;
     }
-    return (baseSpeed / Math.max(1e-6, n)) * 0.75;
+    return (baseSpeed / Math.max(1e-6, n)) * UI_PARAMS.prism.mediumSlowdownFactor;
   };
   const raceDuration = useMemo(() => {
     return snapshot.rays.reduce((acc, r) => {
@@ -145,7 +146,7 @@ export function PrismPanel() {
     }, 0.1);
   }, [snapshot, mode]);
 
-  const loopT = raceDuration > 0 ? clockSec % (raceDuration + 0.8) : 0;
+  const loopT = raceDuration > 0 ? clockSec % (raceDuration + UI_PARAMS.prism.raceLoopTailSec) : 0;
   const activeT = Math.min(loopT, raceDuration);
 
   return (
@@ -270,9 +271,9 @@ export function PrismPanel() {
             <span>{text.angle} {incidentDeg.toFixed(1)}°</span>
             <input
               type="range"
-              min={-15}
-              max={15}
-              step={0.5}
+              min={UI_PARAMS.prism.incidentDeg.min}
+              max={UI_PARAMS.prism.incidentDeg.max}
+              step={UI_PARAMS.prism.incidentDeg.step}
               value={incidentDeg}
               onChange={(e) => {
                 setIncidentDeg(snapAngle(Number(e.target.value)));
@@ -286,9 +287,9 @@ export function PrismPanel() {
             <span>{text.colorSeparation} {colorSeparation.toFixed(1)}</span>
             <input
               type="range"
-              min={0}
-              max={14}
-              step={0.5}
+              min={UI_PARAMS.prism.colorSeparation.min}
+              max={UI_PARAMS.prism.colorSeparation.max}
+              step={UI_PARAMS.prism.colorSeparation.step}
               value={colorSeparation}
               onChange={(e) => {
                 setColorSeparation(Number(e.target.value));

@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { UI_TEXT } from '../../app/uiText';
+import { UI_PARAMS } from '../../app/uiParams';
 
-const VIEW_W = 1000;
-const VIEW_H = 460;
+const VIEW_W = UI_PARAMS.refraction.viewWidth;
+const VIEW_H = UI_PARAMS.refraction.viewHeight;
 const CENTER_X = VIEW_W / 2 - 20;
 const CENTER_Y = VIEW_H / 2;
 
-const BASE_WAVELENGTH = 30;
-const OMEGA = 2.8;
-const BEAM_SIGMA = 52;
+const BASE_WAVELENGTH = UI_PARAMS.refraction.baseWavelength;
+const OMEGA = UI_PARAMS.refraction.omega;
+const BEAM_SIGMA = UI_PARAMS.refraction.beamSigma;
 
-const SAMPLE_W = 500;
-const SAMPLE_H = 230;
+const SAMPLE_W = UI_PARAMS.refraction.sampleWidth;
+const SAMPLE_H = UI_PARAMS.refraction.sampleHeight;
 
 type Vec2 = { x: number; y: number };
 
@@ -156,7 +157,7 @@ export function RefractionPanel() {
       ctx.stroke();
 
       // Short dashed normal at the center intersection.
-      const normalHalfLen = 60;
+      const normalHalfLen = UI_PARAMS.refraction.normalHalfLen;
       const nx0 = CENTER_X - geometry.normal.x * normalHalfLen;
       const ny0 = CENTER_Y - geometry.normal.y * normalHalfLen;
       const nx1 = CENTER_X + geometry.normal.x * normalHalfLen;
@@ -171,7 +172,7 @@ export function RefractionPanel() {
       ctx.setLineDash([]);
 
       // Longer direction marks starting at the normal/interface intersection.
-      const markerLen = 82;
+      const markerLen = UI_PARAMS.refraction.directionMarkerLen;
 
       const incidentDir = norm({ x: geometry.k1.x, y: geometry.k1.y });
       const refractedDir = norm(geometry.k2);

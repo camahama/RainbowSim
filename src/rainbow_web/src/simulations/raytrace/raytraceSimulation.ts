@@ -1,29 +1,40 @@
 import { computeRaytraceSnapshot, type RaytraceInput, type RaytraceSnapshot } from '../../physics/raytrace/engine';
+import { UI_PARAMS } from '../../app/uiParams';
 
 export class RaytraceSimulation {
   private state: RaytraceInput;
 
   constructor(initial?: Partial<RaytraceInput>) {
+    const defaults = UI_PARAMS.raytrace.defaults;
     this.state = {
-      sourceXOffset: initial?.sourceXOffset ?? -180,
-      maxDepth: initial?.maxDepth ?? 12,
-      minIntensity: initial?.minIntensity ?? 0.001,
-      radius: initial?.radius ?? 180,
-      nAir: initial?.nAir ?? 1,
-      nWater: initial?.nWater ?? 1.333,
+      sourceXOffset: initial?.sourceXOffset ?? defaults.sourceXOffset,
+      maxDepth: initial?.maxDepth ?? defaults.maxDepth,
+      minIntensity: initial?.minIntensity ?? defaults.minIntensity,
+      radius: initial?.radius ?? defaults.radius,
+      nAir: initial?.nAir ?? defaults.nAir,
+      nWater: initial?.nWater ?? defaults.nWater,
     };
   }
 
   setSourceXOffset(value: number): void {
-    this.state.sourceXOffset = Math.max(-420, Math.min(420, value));
+    this.state.sourceXOffset = Math.max(
+      UI_PARAMS.raytrace.sourceXOffsetRange.min,
+      Math.min(UI_PARAMS.raytrace.sourceXOffsetRange.max, value),
+    );
   }
 
   setMaxDepth(value: number): void {
-    this.state.maxDepth = Math.max(2, Math.min(18, Math.round(value)));
+    this.state.maxDepth = Math.max(
+      UI_PARAMS.raytrace.maxDepthRange.min,
+      Math.min(UI_PARAMS.raytrace.maxDepthRange.max, Math.round(value)),
+    );
   }
 
   setRadius(value: number): void {
-    this.state.radius = Math.max(80, Math.min(230, value));
+    this.state.radius = Math.max(
+      UI_PARAMS.raytrace.radiusRange.min,
+      Math.min(UI_PARAMS.raytrace.radiusRange.max, value),
+    );
   }
 
   getState(): RaytraceInput {

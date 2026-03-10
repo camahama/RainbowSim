@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { RaytraceSimulation } from '../../simulations/raytrace/raytraceSimulation';
 import { UI_TEXT } from '../../app/uiText';
+import { UI_PARAMS } from '../../app/uiParams';
 
 const sim = new RaytraceSimulation();
 
@@ -107,8 +108,8 @@ export function RaytracePanel() {
             <span>{text.size} {radius.toFixed(0)}</span>
             <input
               type="range"
-              min={80}
-              max={230}
+              min={UI_PARAMS.raytrace.radiusRange.min}
+              max={UI_PARAMS.raytrace.radiusRange.max}
               step={1}
               value={radius}
               onChange={(e) => setRadius(Number(e.target.value))}

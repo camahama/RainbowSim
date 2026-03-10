@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { DROPLET2_BANDS } from '../../physics/droplet2/engine';
 import { Droplet2Simulation } from '../../simulations/droplet2/droplet2Simulation';
 import { UI_TEXT } from '../../app/uiText';
+import { UI_PARAMS } from '../../app/uiParams';
 
 const sim = new Droplet2Simulation();
 
-const SCENE_W = 1000;
-const SCENE_H = 560;
+const SCENE_W = UI_PARAMS.droplet2.sceneWidth;
+const SCENE_H = UI_PARAMS.droplet2.sceneHeight;
 
 function clearCanvas(ctx: CanvasRenderingContext2D | null): void {
   if (!ctx) {
@@ -211,8 +212,8 @@ export function Droplet2Panel() {
             <span>{text.radius} {ui.radius.toFixed(0)}</span>
             <input
               type="range"
-              min={10}
-              max={60}
+              min={UI_PARAMS.droplet2.radiusRange.min}
+              max={UI_PARAMS.droplet2.radiusRange.max}
               step={1}
               value={ui.radius}
               onChange={(e) => {
