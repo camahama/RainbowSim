@@ -35,9 +35,6 @@ export function DropletPanel() {
     return sim.compute();
   }, [visible, focusedIndex, showPrimary, showSecondary, radius, primaryU, secondaryU]);
 
-  const primaryImpactU = primaryU[focusedIndex];
-  const secondaryImpactU = secondaryU[focusedIndex];
-
   const pointerToScene = (evt: React.PointerEvent<SVGSVGElement | SVGCircleElement>) => {
     const rect = evt.currentTarget.getBoundingClientRect();
     const sx = 1000 / rect.width;
@@ -178,43 +175,6 @@ export function DropletPanel() {
             >
               Secondary {showSecondary ? 'ON' : 'OFF'}
             </button>
-            <button
-              type="button"
-              className="mode-btn"
-              onClick={() => {
-                sim.optimizeImpacts();
-                const st = sim.getState();
-                setPrimaryU([...st.primaryU]);
-                setSecondaryU([...st.secondaryU]);
-                setShowPrimary(st.showPrimary);
-                setShowSecondary(st.showSecondary);
-              }}
-            >
-              Optimize
-            </button>
-          </div>
-
-          <label>
-            Radius: <strong>{radius.toFixed(0)} px</strong>
-            <input
-              type="range"
-              min={80}
-              max={240}
-              step={1}
-              value={radius}
-              onChange={(e) => setRadius(Number(e.target.value))}
-            />
-          </label>
-
-          <div className="stats" style={{ marginTop: 0 }}>
-            <div>
-              <span>Primary u</span>
-              <strong>{primaryImpactU.toFixed(3)}</strong>
-            </div>
-            <div>
-              <span>Secondary u</span>
-              <strong>{secondaryImpactU.toFixed(3)}</strong>
-            </div>
           </div>
 
           <div className="droplet-color-list" role="group" aria-label="Color visibility and focus">
@@ -254,6 +214,33 @@ export function DropletPanel() {
               </div>
             ))}
           </div>
+
+          <button
+            type="button"
+            className="mode-btn"
+            onClick={() => {
+              sim.optimizeImpacts();
+              const st = sim.getState();
+              setPrimaryU([...st.primaryU]);
+              setSecondaryU([...st.secondaryU]);
+              setShowPrimary(st.showPrimary);
+              setShowSecondary(st.showSecondary);
+            }}
+          >
+            Optimal Angles
+          </button>
+
+          <label>
+            Radius: <strong>{radius.toFixed(0)} px</strong>
+            <input
+              type="range"
+              min={80}
+              max={240}
+              step={1}
+              value={radius}
+              onChange={(e) => setRadius(Number(e.target.value))}
+            />
+          </label>
         </aside>
       </div>
 

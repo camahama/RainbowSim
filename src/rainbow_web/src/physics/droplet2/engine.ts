@@ -23,13 +23,17 @@ export type LayerRay = {
 };
 
 export function offsetSequence(radius: number, step = 0.2, factor = 0.98): number[] {
-  const start = -radius * factor;
+  const start = 0;
   const end = radius * factor;
   const out: number[] = [];
   for (let x = start; x <= end; x += step) {
     out.push(x);
   }
   return out;
+}
+
+function mirrorPointsX(points: Vec2[], centerX: number): Vec2[] {
+  return points.map((p) => ({ x: 2 * centerX - p.x, y: p.y }));
 }
 
 export function computeDroplet2Path(
@@ -91,17 +95,27 @@ export function buildLayerSlice(
   sceneHeight: number,
 ): LayerRay[] {
   const slice: LayerRay[] = [];
+  const impact = Math.abs(offset);
 
   // Draw violet first, red last to mimic legacy layering feel.
   for (let i = DROPLET2_BANDS.length - 1; i >= 0; i -= 1) {
     const band = DROPLET2_BANDS[i];
-    const points = computeDroplet2Path(offset, band.n, reflections, center, radius, sceneHeight);
+    const points = computeDroplet2Path(impact, band.n, reflections, center, radius, sceneHeight);
     if (points.length >= 2) {
       slice.push({
         bandIndex: i,
         points,
         family: reflections === 0 ? 'transmitted' : reflections === 1 ? 'primary' : 'secondary',
       });
+
+      // Mirror the right-side path to the left to guarantee visual symmetry.
+      if (impact > 1e-6) {
+        slice.push({
+          bandIndex: i,
+          points: mirrorPointsX(points, center.x),
+          family: reflections === 0 ? 'transmitted' : reflections === 1 ? 'primary' : 'secondary',
+        });
+      }
     }
   }
 

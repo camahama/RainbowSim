@@ -188,14 +188,17 @@ function traceBand(start: Vec2, dir: Vec2, nBand: number, poly: Vec2[]): Vec2[] 
   return pts;
 }
 
-export function computePrismSnapshot(mode: PrismMode, incidentDeg: number): PrismSnapshot {
+export function computePrismSnapshot(mode: PrismMode, incidentDeg: number, colorSeparation = 0): PrismSnapshot {
   const polygon = buildModePolygon(mode);
   const theta = (incidentDeg * Math.PI) / 180;
   const dir = norm(v(Math.cos(theta), Math.sin(theta)));
+  const separation = mode === 'air' ? Math.max(10, colorSeparation) : colorSeparation;
 
   const rays = SPECTRUM.map((band, idx) => {
-    const start = v(75 - idx * 16, 230 + idx * 3);
-    return { band, points: traceBand(start, dir, band.n, polygon) };
+    const centeredIndex = idx - (SPECTRUM.length - 1) / 2;
+    const start = v(75 + centeredIndex * separation, 230);
+    const nEff = mode === 'air' ? 1.0 : band.n;
+    return { band: { ...band, n: nEff }, points: traceBand(start, dir, nEff, polygon) };
   });
 
   return { mode, polygon, rays };

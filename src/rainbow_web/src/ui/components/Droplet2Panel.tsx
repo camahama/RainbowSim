@@ -144,9 +144,6 @@ export function Droplet2Panel() {
 
   const primaryLabel = ui.primaryVisible ? 'Primary: CLEAR' : 'Primary: START';
   const secondaryLabel = ui.secondaryVisible ? 'Secondary: CLEAR' : 'Secondary: START';
-  const showTransmission = ui.primaryVisible || ui.secondaryVisible;
-  const progress = `${ui.primaryCursor} / ${ui.secondaryCursor}`;
-
   const resetPrimaryLayer = () => {
     clearCanvas(pTransRef.current);
     clearCanvas(pReflRef.current);
@@ -177,14 +174,8 @@ export function Droplet2Panel() {
             type="button"
             className={ui.primaryVisible ? 'mode-btn active' : 'mode-btn'}
             onClick={() => {
-              const live = sim.getState();
-              if (live.primaryVisible) {
-                sim.clearPrimary();
-                resetPrimaryLayer();
-              } else {
-                sim.startPrimary();
-                resetPrimaryLayer();
-              }
+              sim.togglePrimary();
+              resetPrimaryLayer();
               setUi(sim.uiState());
             }}
           >
@@ -194,54 +185,17 @@ export function Droplet2Panel() {
             type="button"
             className={ui.secondaryVisible ? 'mode-btn active' : 'mode-btn'}
             onClick={() => {
-              const live = sim.getState();
-              if (live.secondaryVisible) {
-                sim.clearSecondary();
-                resetSecondaryLayer();
-              } else {
-                sim.startSecondary();
-                resetSecondaryLayer();
-              }
+              sim.toggleSecondary();
+              resetSecondaryLayer();
               setUi(sim.uiState());
             }}
           >
             {secondaryLabel}
           </button>
         </div>
-
-        <label>
-          Droplet radius: <strong>{ui.radius.toFixed(0)} px</strong>
-          <input
-            type="range"
-            min={10}
-            max={60}
-            step={1}
-            value={ui.radius}
-            onChange={(e) => {
-              sim.setRadius(Number(e.target.value));
-              resetAllLayers();
-              setUi(sim.uiState());
-            }}
-          />
-        </label>
-
-        <label>
-          Sweep speed: <strong>{ui.raysPerTick}</strong>
-          <input
-            type="range"
-            min={1}
-            max={4}
-            step={1}
-            value={ui.raysPerTick}
-            onChange={(e) => {
-              sim.setRaysPerTick(Number(e.target.value));
-              setUi(sim.uiState());
-            }}
-          />
-        </label>
       </div>
 
-      <div className="prism-canvas-wrap">
+      <div className="prism-canvas-wrap droplet2-wrap">
         <canvas
           ref={canvasRef}
           className="prism-canvas"
@@ -249,26 +203,27 @@ export function Droplet2Panel() {
           height={SCENE_H}
           aria-label="Animated droplet accumulation"
         />
+
+        <div className="droplet2-corner-control">
+          <label>
+            <span>Radius {ui.radius.toFixed(0)}</span>
+            <input
+              type="range"
+              min={10}
+              max={60}
+              step={1}
+              value={ui.radius}
+              onChange={(e) => {
+                sim.setRadius(Number(e.target.value));
+                resetAllLayers();
+                setUi(sim.uiState());
+              }}
+            />
+          </label>
+        </div>
       </div>
 
-      <div className="stats">
-        <div>
-          <span>Primary status</span>
-          <strong>{ui.primaryAnimating ? 'Animating' : ui.primaryVisible ? 'Complete' : 'Off'}</strong>
-        </div>
-        <div>
-          <span>Secondary status</span>
-          <strong>{ui.secondaryAnimating ? 'Animating' : ui.secondaryVisible ? 'Complete' : 'Off'}</strong>
-        </div>
-        <div>
-          <span>Cursors (P/S)</span>
-          <strong>{progress}</strong>
-        </div>
-        <div>
-          <span>Transmission cue</span>
-          <strong>{showTransmission ? 'Direct refracted bundle shown' : 'Off (start primary/secondary)'}</strong>
-        </div>
-      </div>
+      {/* Bottom diagnostics removed for presentation mode. */}
     </section>
   );
 }

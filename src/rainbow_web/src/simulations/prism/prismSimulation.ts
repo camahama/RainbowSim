@@ -8,6 +8,7 @@ import {
 export type PrismState = {
   mode: PrismMode;
   incidentDeg: number;
+  colorSeparation: number;
 };
 
 export class PrismSimulation {
@@ -17,6 +18,7 @@ export class PrismSimulation {
     this.state = {
       mode: initial?.mode ?? 'triangle',
       incidentDeg: initial?.incidentDeg ?? 0,
+      colorSeparation: initial?.colorSeparation ?? 0,
     };
   }
 
@@ -25,7 +27,11 @@ export class PrismSimulation {
   }
 
   setIncidentDeg(incidentDeg: number): void {
-    this.state.incidentDeg = Math.max(-35, Math.min(35, incidentDeg));
+    this.state.incidentDeg = Math.max(-15, Math.min(15, incidentDeg));
+  }
+
+  setColorSeparation(value: number): void {
+    this.state.colorSeparation = Math.max(0, Math.min(14, value));
   }
 
   getState(): PrismState {
@@ -37,6 +43,6 @@ export class PrismSimulation {
   }
 
   compute(): PrismSnapshot {
-    return computePrismSnapshot(this.state.mode, this.state.incidentDeg);
+    return computePrismSnapshot(this.state.mode, this.state.incidentDeg, this.state.colorSeparation);
   }
 }

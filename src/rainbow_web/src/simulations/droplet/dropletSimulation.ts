@@ -42,12 +42,14 @@ export class DropletSimulation {
 
   constructor() {
     const count = RAINBOW_BANDS.length;
+    const defaultRadius = 100;
+    const defaultImpact = 56;
     this.state = {
-      visible: new Array<boolean>(count).fill(true),
+      visible: new Array<boolean>(count).fill(false),
       focusedIndex: 0,
-      primaryU: new Array<number>(count).fill(uFromImpact(95, 170)),
-      secondaryU: new Array<number>(count).fill(uFromImpact(95, 170)),
-      radius: 170,
+      primaryU: new Array<number>(count).fill(uFromImpact(defaultImpact, defaultRadius)),
+      secondaryU: new Array<number>(count).fill(uFromImpact(defaultImpact, defaultRadius)),
+      radius: defaultRadius,
       showPrimary: false,
       showSecondary: false,
     };

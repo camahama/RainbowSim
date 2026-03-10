@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { PrismSimulation } from '../../simulations/prism/prismSimulation';
 import type { PrismMode, Vec2 } from '../../physics/prism/engine';
 
@@ -8,17 +8,140 @@ function pointsToSvg(points: Vec2[]): string {
   return points.map((p) => `${p.x},${p.y}`).join(' ');
 }
 
+function len(a: Vec2, b: Vec2): number {
+  return Math.hypot(b.x - a.x, b.y - a.y);
+}
+
+function lerp(a: Vec2, b: Vec2, t: number): Vec2 {
+  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+}
+
+function pointInPolygon(p: Vec2, poly: Vec2[]): boolean {
+  if (poly.length < 3) {
+    return false;
+  }
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i].x;
+    const yi = poly[i].y;
+    const xj = poly[j].x;
+    const yj = poly[j].y;
+
+    const intersect = yi > p.y !== yj > p.y && p.x < ((xj - xi) * (p.y - yi)) / (yj - yi + 1e-9) + xi;
+    if (intersect) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}
+
+function pathAtTime(points: Vec2[], tSec: number, speedAir: number, speedMedium: number, poly: Vec2[]): Vec2[] {
+  if (points.length <= 1) {
+    return points;
+  }
+
+  const out: Vec2[] = [points[0]];
+  let tLeft = tSec;
+
+  for (let i = 1; i < points.length; i += 1) {
+    const a = points[i - 1];
+    const b = points[i];
+    const segLen = len(a, b);
+    if (segLen <= 1e-6) {
+      continue;
+    }
+
+    const mid = lerp(a, b, 0.5);
+    const inMedium = poly.length > 0 && pointInPolygon(mid, poly);
+    const v = inMedium ? speedMedium : speedAir;
+    const dt = segLen / Math.max(1e-6, v);
+
+    if (tLeft >= dt) {
+      out.push(b);
+      tLeft -= dt;
+      continue;
+    }
+
+    const f = Math.max(0, Math.min(1, tLeft / dt));
+    out.push(lerp(a, b, f));
+    return out;
+  }
+
+  return out;
+}
+
+function totalTravelTime(points: Vec2[], speedAir: number, speedMedium: number, poly: Vec2[]): number {
+  let t = 0;
+  for (let i = 1; i < points.length; i += 1) {
+    const a = points[i - 1];
+    const b = points[i];
+    const segLen = len(a, b);
+    if (segLen <= 1e-6) {
+      continue;
+    }
+    const mid = lerp(a, b, 0.5);
+    const inMedium = poly.length > 0 && pointInPolygon(mid, poly);
+    const v = inMedium ? speedMedium : speedAir;
+    t += segLen / Math.max(1e-6, v);
+  }
+  return t;
+}
+
 export function PrismPanel() {
   const [mode, setMode] = useState<PrismMode>(sim.getState().mode);
   const [incidentDeg, setIncidentDeg] = useState<number>(sim.getState().incidentDeg);
+  const [colorSeparation, setColorSeparation] = useState<number>(sim.getState().colorSeparation);
+  const [clockSec, setClockSec] = useState(0);
+  const [running, setRunning] = useState(false);
+  const raceStartMs = useRef(0);
+
+  useEffect(() => {
+    if (!running) {
+      return;
+    }
+    if (raceStartMs.current <= 0) {
+      raceStartMs.current = performance.now();
+    }
+
+    let raf = 0;
+    const tick = (ts: number) => {
+      setClockSec((ts - raceStartMs.current) / 1000);
+      raf = window.requestAnimationFrame(tick);
+    };
+    raf = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(raf);
+  }, [running]);
 
   const snapshot = useMemo(() => {
     sim.setMode(mode);
     sim.setIncidentDeg(incidentDeg);
+    sim.setColorSeparation(colorSeparation);
     return sim.compute();
-  }, [mode, incidentDeg]);
+  }, [mode, incidentDeg, colorSeparation]);
 
   const description = sim.description();
+
+  const snapAngle = (value: number): number => {
+    if (Math.abs(value) <= 0.5) {
+      return 0;
+    }
+    return value;
+  };
+
+  const baseSpeed = 250;
+  const nValues = snapshot.rays.map((r) => r.band.n);
+  const minN = Math.min(...nValues);
+  const maxN = Math.max(...nValues);
+  const nSpan = Math.max(1e-6, maxN - minN);
+  const raceDuration = useMemo(() => {
+    return snapshot.rays.reduce((acc, r) => {
+      const speedMedium = mode === 'air' ? baseSpeed : baseSpeed * (minN / r.band.n);
+      return Math.max(acc, totalTravelTime(r.points, baseSpeed, speedMedium, snapshot.polygon));
+    }, 0.1);
+  }, [snapshot, mode]);
+
+  const loopT = raceDuration > 0 ? clockSec % (raceDuration + 0.8) : 0;
+  const activeT = Math.min(loopT, raceDuration);
 
   return (
     <section className="panel prism-panel">
@@ -27,48 +150,71 @@ export function PrismPanel() {
 
       <div className="controls prism-controls">
         <div className="mode-row" role="group" aria-label="Prism mode">
-          <button type="button" className={mode === 'air' ? 'mode-btn active' : 'mode-btn'} onClick={() => setMode('air')}>
+          <button
+            type="button"
+            className="mode-btn"
+            onClick={() => {
+              raceStartMs.current = 0;
+              setRunning(false);
+              setClockSec(0);
+            }}
+          >
+            Clear
+          </button>
+          <button
+            type="button"
+            className={mode === 'air' ? 'mode-btn active' : 'mode-btn'}
+            onClick={() => {
+              setMode('air');
+              raceStartMs.current = performance.now();
+              setClockSec(0);
+              setRunning(true);
+            }}
+          >
             Air
           </button>
           <button
             type="button"
             className={mode === 'block_straight' ? 'mode-btn active' : 'mode-btn'}
-            onClick={() => setMode('block_straight')}
+            onClick={() => {
+              setMode('block_straight');
+              raceStartMs.current = performance.now();
+              setClockSec(0);
+              setRunning(true);
+            }}
           >
             Straight
           </button>
           <button
             type="button"
             className={mode === 'block_rotated' ? 'mode-btn active' : 'mode-btn'}
-            onClick={() => setMode('block_rotated')}
+            onClick={() => {
+              setMode('block_rotated');
+              raceStartMs.current = performance.now();
+              setClockSec(0);
+              setRunning(true);
+            }}
           >
             Rotated
           </button>
           <button
             type="button"
             className={mode === 'triangle' ? 'mode-btn active' : 'mode-btn'}
-            onClick={() => setMode('triangle')}
+            onClick={() => {
+              setMode('triangle');
+              raceStartMs.current = performance.now();
+              setClockSec(0);
+              setRunning(true);
+            }}
           >
             Prism
           </button>
         </div>
-
-        <label>
-          Incoming angle: <strong>{incidentDeg.toFixed(1)} deg</strong>
-          <input
-            type="range"
-            min={-35}
-            max={35}
-            step={0.5}
-            value={incidentDeg}
-            onChange={(e) => setIncidentDeg(Number(e.target.value))}
-          />
-        </label>
       </div>
 
       <p className="mode-description">{description}</p>
 
-      <div className="prism-canvas-wrap">
+      <div className="prism-canvas-wrap prism-wrap">
         <svg viewBox="0 0 1000 460" className="prism-canvas" role="img" aria-label="Prism ray tracing visualization">
           <rect x="0" y="0" width="1000" height="460" fill="#0a0f14" />
 
@@ -81,19 +227,66 @@ export function PrismPanel() {
             />
           ) : null}
 
-          {snapshot.rays.map((ray) => (
-            <polyline
-              key={ray.band.name}
-              className="additive-ray"
-              points={pointsToSvg(ray.points)}
-              fill="none"
-              stroke={ray.band.color}
-              strokeWidth={3.8}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          ))}
+          {running
+            ? snapshot.rays.map((ray) => {
+            const speedMedium = mode === 'air' ? baseSpeed : baseSpeed * (minN / ray.band.n);
+            const violetHeadStart = colorSeparation * 0.05;
+            const tBand = activeT + ((ray.band.n - minN) / nSpan) * violetHeadStart;
+            const partial = pathAtTime(ray.points, tBand, baseSpeed, speedMedium, snapshot.polygon);
+            const head = partial[partial.length - 1];
+
+            return (
+              <g key={ray.band.name}>
+                <polyline
+                  className="additive-ray"
+                  points={pointsToSvg(partial)}
+                  fill="none"
+                  stroke={ray.band.color}
+                  strokeWidth={3.8}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                {head ? <circle className="additive-ray" cx={head.x} cy={head.y} r={4} fill={ray.band.color} /> : null}
+              </g>
+            );
+          })
+            : null}
         </svg>
+
+        <div className="prism-corner-control">
+          <label>
+            <span>Angle {incidentDeg.toFixed(1)}°</span>
+            <input
+              type="range"
+              min={-15}
+              max={15}
+              step={0.5}
+              value={incidentDeg}
+              onChange={(e) => {
+                setIncidentDeg(snapAngle(Number(e.target.value)));
+                raceStartMs.current = performance.now();
+                setRunning(true);
+                setClockSec(0);
+              }}
+            />
+          </label>
+          <label>
+            <span>Color separation {colorSeparation.toFixed(1)}</span>
+            <input
+              type="range"
+              min={0}
+              max={14}
+              step={0.5}
+              value={colorSeparation}
+              onChange={(e) => {
+                setColorSeparation(Number(e.target.value));
+                raceStartMs.current = performance.now();
+                setRunning(true);
+                setClockSec(0);
+              }}
+            />
+          </label>
+        </div>
       </div>
 
       <div className="legend">

@@ -34,11 +34,12 @@ export type Droplet2UiState = {
 
 export class Droplet2Simulation {
   private state: Droplet2State;
+  private static readonly MAX_RADIUS = 60;
 
   constructor() {
     this.state = {
       radius: 26,
-      center: { x: 500, y: 180 },
+      center: { x: 500, y: 145 },
       sceneWidth: 1000,
       sceneHeight: 560,
       step: 0.1,
@@ -89,7 +90,9 @@ export class Droplet2Simulation {
   }
 
   private offsets(): number[] {
-    return offsetSequence(this.state.radius, this.state.step);
+    const base = offsetSequence(Droplet2Simulation.MAX_RADIUS, this.state.step);
+    const scale = this.state.radius / Droplet2Simulation.MAX_RADIUS;
+    return base.map((x) => x * scale);
   }
 
   startPrimary(): void {
