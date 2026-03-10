@@ -281,7 +281,7 @@ export function RainbowPanel() {
             setIsDragging(false);
             previewRef.current = null;
           }}
-          aria-label={text.canvasAria}
+          aria-label="Rainbow field accumulation"
         />
       </div>
 

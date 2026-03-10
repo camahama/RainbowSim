@@ -225,7 +225,7 @@ export function RefractionPanel() {
           width={VIEW_W}
           height={VIEW_H}
           role="img"
-          aria-label={text.canvasAria}
+          aria-label="Refraction wavefield visualization"
         />
 
         <div className="refraction-corner-control">

@@ -95,6 +95,7 @@ export function PrismPanel() {
   const [colorSeparation, setColorSeparation] = useState<number>(sim.getState().colorSeparation);
   const [clockSec, setClockSec] = useState(0);
   const [running, setRunning] = useState(false);
+  const [started, setStarted] = useState(false);
   const raceStartMs = useRef(0);
 
   useEffect(() => {
@@ -153,13 +154,14 @@ export function PrismPanel() {
       <p className="panel-lead">{text.lead}</p>
 
       <div className="controls prism-controls">
-        <div className="mode-row" role="group" aria-label={text.modeGroupAria}>
+        <div className="mode-row" role="group" aria-label="Prism mode controls">
           <button
             type="button"
             className="mode-btn"
             onClick={() => {
               raceStartMs.current = 0;
               setRunning(false);
+              setStarted(false);
               setClockSec(0);
             }}
           >
@@ -173,6 +175,7 @@ export function PrismPanel() {
               setColorSeparation(8);
               raceStartMs.current = performance.now();
               setClockSec(0);
+              setStarted(true);
               setRunning(true);
             }}
           >
@@ -186,6 +189,7 @@ export function PrismPanel() {
               setColorSeparation(0);
               raceStartMs.current = performance.now();
               setClockSec(0);
+              setStarted(true);
               setRunning(true);
             }}
           >
@@ -199,6 +203,7 @@ export function PrismPanel() {
               setColorSeparation(0);
               raceStartMs.current = performance.now();
               setClockSec(0);
+              setStarted(true);
               setRunning(true);
             }}
           >
@@ -212,6 +217,7 @@ export function PrismPanel() {
               setColorSeparation(0);
               raceStartMs.current = performance.now();
               setClockSec(0);
+              setStarted(true);
               setRunning(true);
             }}
           >
@@ -223,10 +229,10 @@ export function PrismPanel() {
       <p className="mode-description">{description}</p>
 
       <div className="prism-canvas-wrap prism-wrap">
-        <svg viewBox="0 0 1000 460" className="prism-canvas" role="img" aria-label={text.canvasAria}>
+        <svg viewBox="0 0 1000 460" className="prism-canvas" role="img" aria-label="Prism ray tracing visualization">
           <rect x="0" y="0" width="1000" height="460" fill="#0a0f14" />
 
-          {snapshot.polygon.length > 0 ? (
+          {started && snapshot.polygon.length > 0 ? (
             <polygon
               points={pointsToSvg(snapshot.polygon)}
               fill="rgba(110, 150, 190, 0.24)"
@@ -235,7 +241,7 @@ export function PrismPanel() {
             />
           ) : null}
 
-          {running
+          {started && running
             ? snapshot.rays.map((ray) => {
             const speedMedium = mediumSpeedForBand(ray.band.n);
             const partial = pathAtTime(ray.points, activeT, baseSpeed, speedMedium, snapshot.polygon);

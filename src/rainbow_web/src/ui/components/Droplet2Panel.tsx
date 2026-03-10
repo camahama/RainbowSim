@@ -171,7 +171,7 @@ export function Droplet2Panel() {
       <p className="panel-lead">{text.lead}</p>
 
       <div className="controls">
-        <div className="mode-row" role="group" aria-label={text.controlsAria}>
+        <div className="mode-row" role="group" aria-label="Droplet2 controls">
           <button
             type="button"
             className={ui.primaryVisible ? 'mode-btn active' : 'mode-btn'}
@@ -203,7 +203,7 @@ export function Droplet2Panel() {
           className="prism-canvas"
           width={SCENE_W}
           height={SCENE_H}
-          aria-label={text.canvasAria}
+          aria-label="Animated droplet accumulation"
         />
 
         <div className="droplet2-corner-control">

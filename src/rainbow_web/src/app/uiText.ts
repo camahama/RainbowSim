@@ -1,8 +1,8 @@
 import type { SimulationId } from './registry';
 
 export const UI_TEXT = {
-  appTitle: 'Rainbow Simulation',
-  appSubtitle: 'Select a module',
+  appTitle: 'Rainbow Physics Simulator - select a module to begin',
+  appSubtitle: 'vibecoded by martin.magnusson@fysik.lu.se 2026',
   menuButton: 'Menu',
   fallbackTitle: 'Module Unavailable',
   fallbackBody: 'This module is not available in the current build.',
@@ -17,16 +17,13 @@ export const UI_TEXT = {
   modules: {
     refraction: {
       title: 'Refraction',
-      lead: 'Plane wave from the left crossing a sloped interface',
-      canvasAria: 'The waves travel slower in a denser medium, leading to a change of direction',
+      lead: 'Plane wave from the left crossing a sloped interface. The waves travel slower in a denser medium, leading to a change of direction.',
       interfaceAngle: 'Interface angle',
       mediumIndex: 'Medium index n',
     },
     prism: {
-      title: 'Blocks and Prism',
-      lead: 'Polygon ray tracing with wavelength-dependent indices',
-      modeGroupAria: 'Prism mode',
-      canvasAria: 'Prism ray tracing visualization',
+      title: 'Light Speed in Media - The Prism',
+      lead: 'Polygon ray tracing with wavelength-dependent refractive indices',
       clear: 'Clear',
       air: 'Air',
       straight: 'Straight',
@@ -70,8 +67,6 @@ export const UI_TEXT = {
     droplet2: {
       title: 'Light dispersion in a droplet',
       lead: 'White light enters a spherical water droplet and disperses into a rainbow. Turn the single and double reflection on or off. Most of the light passes through.',
-      controlsAria: 'Hmmm2',
-      canvasAria: 'Hmmm3',
       primaryStart: 'Primary: START',
       primaryClear: 'Primary: CLEAR',
       secondaryStart: 'Secondary: START',
@@ -81,7 +76,6 @@ export const UI_TEXT = {
     rainbow: {
       title: 'Rainbow Simulator',
       lead: 'A droplet gives one colored dot, depending on viewing angle. Place droplets manually or start a rain to see the rainbow form',
-      canvasAria: 'Hmmm4',
       startRain: 'Start Rain',
       stopRain: 'Stop Rain',
       clear: 'Clear',
