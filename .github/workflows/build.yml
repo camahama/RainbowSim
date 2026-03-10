@@ -9,30 +9,31 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+    defaults:
+      run:
+        working-directory: src/rainbow_web
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - uses: actions/checkout@v4
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
       with:
-        python-version: '3.11'
-    
+        node-version: '20'
+        cache: npm
+        cache-dependency-path: src/rainbow_web/package-lock.json
+
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r rainbow_web/requirements.txt
-    
+      run: npm ci
+
     - name: Build for web
-      run: |
-        cd rainbow_web
-        pygbag main.py --build web
-    
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      run: VITE_BASE_PATH=/RainbowSim/ npm run build
+
+    - name: Upload dist artifact
+      uses: actions/upload-artifact@v4
       with:
         name: rainbowsim-web
-        path: rainbow_web/web/
+        path: src/rainbow_web/dist/
 
     - name: Create deployment report
       if: success()
