@@ -63,8 +63,11 @@ function stampToLayer(layer: LayerState, drop: RainbowDropSample): void {
       }
 
       const t = dist / Math.max(1e-6, drop.radius);
-      const iLift = Math.pow(Math.max(0, Math.min(1, drop.intensity)), 0.72);
-      const iTone = iLift / (1 + 0.55 * iLift);
+      const iLift = Math.pow(
+        Math.max(0, Math.min(1, drop.intensity)),
+        UI_PARAMS.rainbow.intensityMapping.gamma,
+      );
+      const iTone = iLift / (1 + UI_PARAMS.rainbow.intensityMapping.compression * iLift);
       const a = iTone * (1 - t) * (1 - t);
       if (a <= 0.001) {
         continue;
@@ -92,8 +95,11 @@ function previewFillColor(r: number, g: number, b: number, intensity: number): s
     return 'rgb(0,0,0)';
   }
 
-  const iLift = Math.pow(Math.max(0, Math.min(1, intensity)), 0.72);
-  const k = iLift / (1 + 0.55 * iLift);
+  const iLift = Math.pow(
+    Math.max(0, Math.min(1, intensity)),
+    UI_PARAMS.rainbow.intensityMapping.gamma,
+  );
+  const k = iLift / (1 + UI_PARAMS.rainbow.intensityMapping.compression * iLift);
   const rr = Math.max(0, Math.min(255, Math.floor(r * k)));
   const gg = Math.max(0, Math.min(255, Math.floor(g * k)));
   const bb = Math.max(0, Math.min(255, Math.floor(b * k)));

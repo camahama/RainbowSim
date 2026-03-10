@@ -65,6 +65,10 @@ export const UI_PARAMS = {
       maxPoints: 9000,
     },
     intensityThreshold: 0.0001,
+    intensityMapping: {
+      gamma: 0.72,
+      compression: 0.8,
+    },
     manualDropRadius: {
       normal: 8.4,
       boosted: 10.5,
