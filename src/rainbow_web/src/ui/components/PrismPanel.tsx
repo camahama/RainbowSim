@@ -129,13 +129,15 @@ export function PrismPanel() {
   };
 
   const baseSpeed = 250;
-  const nValues = snapshot.rays.map((r) => r.band.n);
-  const minN = Math.min(...nValues);
-  const maxN = Math.max(...nValues);
-  const nSpan = Math.max(1e-6, maxN - minN);
+  const mediumSpeedForBand = (n: number): number => {
+    if (mode === 'air') {
+      return baseSpeed;
+    }
+    return (baseSpeed / Math.max(1e-6, n)) * 0.75;
+  };
   const raceDuration = useMemo(() => {
     return snapshot.rays.reduce((acc, r) => {
-      const speedMedium = mode === 'air' ? baseSpeed : baseSpeed * (minN / r.band.n);
+      const speedMedium = mediumSpeedForBand(r.band.n);
       return Math.max(acc, totalTravelTime(r.points, baseSpeed, speedMedium, snapshot.polygon));
     }, 0.1);
   }, [snapshot, mode]);
@@ -166,6 +168,7 @@ export function PrismPanel() {
             className={mode === 'air' ? 'mode-btn active' : 'mode-btn'}
             onClick={() => {
               setMode('air');
+              setColorSeparation(8);
               raceStartMs.current = performance.now();
               setClockSec(0);
               setRunning(true);
@@ -178,6 +181,7 @@ export function PrismPanel() {
             className={mode === 'block_straight' ? 'mode-btn active' : 'mode-btn'}
             onClick={() => {
               setMode('block_straight');
+              setColorSeparation(0);
               raceStartMs.current = performance.now();
               setClockSec(0);
               setRunning(true);
@@ -190,6 +194,7 @@ export function PrismPanel() {
             className={mode === 'block_rotated' ? 'mode-btn active' : 'mode-btn'}
             onClick={() => {
               setMode('block_rotated');
+              setColorSeparation(0);
               raceStartMs.current = performance.now();
               setClockSec(0);
               setRunning(true);
@@ -202,6 +207,7 @@ export function PrismPanel() {
             className={mode === 'triangle' ? 'mode-btn active' : 'mode-btn'}
             onClick={() => {
               setMode('triangle');
+              setColorSeparation(0);
               raceStartMs.current = performance.now();
               setClockSec(0);
               setRunning(true);
@@ -229,10 +235,8 @@ export function PrismPanel() {
 
           {running
             ? snapshot.rays.map((ray) => {
-            const speedMedium = mode === 'air' ? baseSpeed : baseSpeed * (minN / ray.band.n);
-            const violetHeadStart = colorSeparation * 0.05;
-            const tBand = activeT + ((ray.band.n - minN) / nSpan) * violetHeadStart;
-            const partial = pathAtTime(ray.points, tBand, baseSpeed, speedMedium, snapshot.polygon);
+            const speedMedium = mediumSpeedForBand(ray.band.n);
+            const partial = pathAtTime(ray.points, activeT, baseSpeed, speedMedium, snapshot.polygon);
             const head = partial[partial.length - 1];
 
             return (

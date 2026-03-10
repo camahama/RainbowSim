@@ -69,7 +69,7 @@ function buildModePolygon(mode: PrismMode): Vec2[] {
   if (mode === 'block_straight') {
     const cx = 560;
     const cy = 230;
-    const hw = 210;
+    const hw = 141;
     const hh = 95;
     return [v(cx - hw, cy - hh), v(cx - hw, cy + hh), v(cx + hw, cy + hh), v(cx + hw, cy - hh)];
   }
@@ -192,11 +192,11 @@ export function computePrismSnapshot(mode: PrismMode, incidentDeg: number, color
   const polygon = buildModePolygon(mode);
   const theta = (incidentDeg * Math.PI) / 180;
   const dir = norm(v(Math.cos(theta), Math.sin(theta)));
-  const separation = mode === 'air' ? Math.max(10, colorSeparation) : colorSeparation;
+  const separation = colorSeparation;
 
   const rays = SPECTRUM.map((band, idx) => {
     const centeredIndex = idx - (SPECTRUM.length - 1) / 2;
-    const start = v(75 + centeredIndex * separation, 230);
+    const start = v(75, 230 + centeredIndex * separation);
     const nEff = mode === 'air' ? 1.0 : band.n;
     return { band: { ...band, n: nEff }, points: traceBand(start, dir, nEff, polygon) };
   });

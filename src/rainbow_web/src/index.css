@@ -251,6 +251,34 @@ input[type='range'] {
   position: relative;
 }
 
+.refraction-wrap {
+  position: relative;
+}
+
+.refraction-corner-control {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  z-index: 8;
+  width: 205px;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.74);
+  display: grid;
+  gap: 0.4rem;
+}
+
+.refraction-corner-control label {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.refraction-corner-control span {
+  font-size: 0.78rem;
+  color: #ddd;
+}
+
 .prism-corner-control {
   position: absolute;
   right: 0.6rem;
