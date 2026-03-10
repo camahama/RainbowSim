@@ -70,26 +70,272 @@ body {
   margin-top: 1.2rem;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.55rem;
+  gap: 0.75rem;
 }
 
 .menu-card {
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #141414;
+  border-radius: 12px;
+  background: radial-gradient(120% 120% at 10% 10%, #1a1f26 0%, #141414 55%, #0f1012 100%);
   color: inherit;
   text-align: center;
-  padding: 0.8rem;
+  padding: 1.2rem 0.9rem 0.95rem;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  display: grid;
+  justify-items: center;
+  gap: 0.72rem;
 }
 
 .menu-card:hover {
-  background: #1c1c1c;
+  background: radial-gradient(120% 120% at 10% 10%, #202a34 0%, #191c22 60%, #121315 100%);
+  border-color: #4b5564;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
 }
 
 .menu-card.active {
-  border-color: #9e9e9e;
+  border-color: #9db9ff;
+  box-shadow: inset 0 0 0 1px rgba(157, 185, 255, 0.35), 0 12px 26px rgba(0, 0, 0, 0.38);
+}
+
+.menu-icon-wrap {
+  width: 176px;
+  height: 176px;
+  border-radius: 36px;
+  border: 1px solid rgba(170, 190, 220, 0.34);
+  background: radial-gradient(90% 90% at 30% 20%, rgba(97, 136, 196, 0.28) 0%, rgba(27, 33, 43, 0.5) 65%, rgba(10, 12, 15, 0.72) 100%);
+  display: grid;
+  place-items: center;
+}
+
+.menu-icon-refraction {
+  background: radial-gradient(95% 95% at 30% 20%, rgba(72, 147, 237, 0.3) 0%, rgba(20, 38, 66, 0.56) 65%, rgba(7, 13, 24, 0.82) 100%);
+}
+
+.menu-icon-prism {
+  background: radial-gradient(95% 95% at 35% 15%, rgba(74, 83, 109, 0.28) 0%, rgba(17, 19, 26, 0.72) 58%, rgba(7, 8, 11, 0.92) 100%);
+}
+
+.menu-icon-raytrace {
+  background: radial-gradient(95% 95% at 30% 20%, rgba(89, 130, 212, 0.32) 0%, rgba(19, 34, 63, 0.58) 65%, rgba(7, 14, 27, 0.82) 100%);
+}
+
+.menu-icon-droplet {
+  background: radial-gradient(95% 95% at 30% 20%, rgba(92, 134, 216, 0.32) 0%, rgba(20, 36, 66, 0.58) 65%, rgba(7, 14, 28, 0.82) 100%);
+}
+
+.menu-icon-droplet2 {
+  background: radial-gradient(95% 95% at 50% 10%, rgba(196, 182, 230, 0.35) 0%, rgba(82, 74, 116, 0.58) 46%, rgba(28, 30, 48, 0.84) 100%);
+}
+
+.menu-icon-rainbow {
+  background: radial-gradient(95% 95% at 30% 20%, rgba(255, 132, 132, 0.25) 0%, rgba(56, 24, 35, 0.54) 50%, rgba(21, 14, 28, 0.78) 100%);
+}
+
+.menu-icon-svg {
+  width: 124px;
+  height: 124px;
+  overflow: visible;
+}
+
+.menu-icon-svg path,
+.menu-icon-svg line,
+.menu-icon-svg circle,
+.menu-icon-svg polygon {
+  stroke: #d8ebff;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.menu-icon-svg .menu-stroke-main {
+  stroke: #cbecff;
+}
+
+.menu-icon-svg .menu-stroke-soft {
+  stroke: #9ed4ff;
+}
+
+.menu-icon-svg .menu-stroke-accent {
+  stroke: #9affc6;
+}
+
+.menu-icon-svg .menu-tile {
+  fill: rgba(10, 10, 10, 0.5);
+  stroke: rgba(255, 255, 255, 0.3);
+}
+
+.menu-icon-svg .menu-stroke-guide {
+  stroke: #b7c9f3;
+  stroke-width: 1.4;
+  opacity: 0.45;
+  stroke-dasharray: 4 4;
+}
+
+.menu-icon-svg .menu-stroke-dashed {
+  stroke: #60f0a0;
+  stroke-width: 3;
+  stroke-dasharray: 5 5;
+}
+
+.menu-icon-svg .menu-prism-white {
+  fill: rgba(255, 255, 255, 0.85);
+  stroke: none;
+}
+
+.menu-icon-svg .menu-prism-core {
+  fill: rgba(255, 255, 255, 0.9);
+  stroke: none;
+}
+
+.menu-icon-svg .menu-prism-violet {
+  stroke: rgba(187, 154, 255, 0.72);
+  stroke-width: 3.2;
+}
+
+.menu-icon-svg .menu-prism-rainbow-r {
+  stroke: rgba(255, 104, 104, 0.88);
+  stroke-width: 2.6;
+}
+
+.menu-icon-svg .menu-prism-rainbow-o {
+  stroke: rgba(255, 172, 88, 0.86);
+  stroke-width: 2.6;
+}
+
+.menu-icon-svg .menu-prism-rainbow-y {
+  stroke: rgba(255, 225, 108, 0.86);
+  stroke-width: 2.6;
+}
+
+.menu-icon-svg .menu-prism-rainbow-g {
+  stroke: rgba(121, 233, 146, 0.86);
+  stroke-width: 2.6;
+}
+
+.menu-icon-svg .menu-prism-rainbow-b {
+  stroke: rgba(131, 179, 255, 0.86);
+  stroke-width: 2.6;
+}
+
+.menu-icon-svg .menu-dsotm-in {
+  stroke: rgba(255, 255, 255, 0.95);
+  stroke-width: 3.1;
+}
+
+.menu-icon-svg .menu-dsotm-prism {
+  stroke: rgba(216, 228, 250, 0.92);
+  stroke-width: 2.5;
+}
+
+.menu-icon-svg .menu-dsotm-r1 {
+  stroke: rgba(255, 92, 98, 0.9);
+}
+
+.menu-icon-svg .menu-dsotm-r2 {
+  stroke: rgba(255, 162, 64, 0.9);
+}
+
+.menu-icon-svg .menu-dsotm-r3 {
+  stroke: rgba(255, 222, 91, 0.9);
+}
+
+.menu-icon-svg .menu-dsotm-r4 {
+  stroke: rgba(124, 228, 134, 0.9);
+}
+
+.menu-icon-svg .menu-dsotm-r5 {
+  stroke: rgba(102, 177, 255, 0.9);
+}
+
+.menu-icon-svg .menu-dsotm-r6 {
+  stroke: rgba(164, 130, 255, 0.9);
+}
+
+.menu-icon-svg .menu-dsotm-r1,
+.menu-icon-svg .menu-dsotm-r2,
+.menu-icon-svg .menu-dsotm-r3,
+.menu-icon-svg .menu-dsotm-r4,
+.menu-icon-svg .menu-dsotm-r5,
+.menu-icon-svg .menu-dsotm-r6 {
+  stroke-width: 2.2;
+}
+
+.menu-icon-svg .menu-raytrace-circle {
+  stroke: rgba(160, 203, 255, 0.82);
+  stroke-width: 2;
+}
+
+.menu-icon-svg .menu-raytrace-main {
+  stroke: rgba(255, 247, 226, 0.95);
+  stroke-width: 2.9;
+}
+
+.menu-icon-svg .menu-raytrace-main-soft {
+  stroke: rgba(245, 240, 226, 0.38);
+  stroke-width: 2.4;
+}
+
+.menu-icon-svg .menu-raytrace-faint {
+  stroke: rgba(160, 171, 190, 0.25);
+  stroke-width: 2.2;
+}
+
+.menu-icon-svg .menu-raytrace-edge-hit {
+  fill: rgba(255, 248, 230, 0.95);
+  stroke: none;
+}
+
+.menu-icon-svg .menu-refrac-left {
+  fill: rgba(36, 162, 255, 0.34);
+  stroke: none;
+}
+
+.menu-icon-svg .menu-refrac-right {
+  fill: rgba(85, 247, 196, 0.3);
+  stroke: none;
+}
+
+.menu-icon-svg .menu-refrac-boundary {
+  stroke: rgba(216, 226, 246, 0.75);
+  stroke-width: 1.6;
+}
+
+.menu-icon-svg .menu-refrac-incident {
+  stroke: rgba(157, 217, 255, 0.95);
+  stroke-width: 2.8;
+}
+
+.menu-icon-svg .menu-refrac-refracted {
+  stroke: rgba(118, 255, 199, 0.92);
+  stroke-width: 2.8;
+}
+
+.menu-icon-svg .menu-refrac-normal {
+  stroke: rgba(214, 225, 242, 0.7);
+  stroke-width: 1.8;
+  stroke-dasharray: 4 4;
+}
+
+.menu-icon-svg .menu-rainbow-red {
+  stroke: #ff6a5f;
+  stroke-width: 4;
+}
+
+.menu-icon-svg .menu-rainbow-green {
+  stroke: #6df2a0;
+  stroke-width: 4;
+}
+
+.menu-icon-svg .menu-rainbow-blue {
+  stroke: #6cb7ff;
+  stroke-width: 4;
+}
+
+.menu-card-label {
+  font-size: 1.06rem;
+  letter-spacing: 0.01em;
 }
 
 .workspace {
