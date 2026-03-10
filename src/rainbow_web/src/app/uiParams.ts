@@ -68,6 +68,7 @@ export const UI_PARAMS = {
     intensityMapping: {
       gamma: 0.72,
       compression: 0.8,
+      brightnessGain: 1.2,
     },
     manualDropRadius: {
       normal: 8.4,

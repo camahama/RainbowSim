@@ -112,7 +112,6 @@ export class DropletSimulation {
     }
 
     this.state.showPrimary = true;
-    this.state.showSecondary = true;
   }
 
   compute(layout?: Partial<DropletLayout>): DropletSnapshot {
