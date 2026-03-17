@@ -20,7 +20,7 @@ export const UI_PARAMS = {
   },
   raytrace: {
     defaults: {
-      sourceXOffset: -180,
+      sourceXOffset: -250,
       maxDepth: 12,
       minIntensity: 0.001,
       radius: 180,
@@ -33,7 +33,7 @@ export const UI_PARAMS = {
   },
   droplet: {
     defaults: {
-      radius: 100,
+      radius: 160,
       impact: 56,
     },
     radiusRange: { min: 80, max: 240 },
