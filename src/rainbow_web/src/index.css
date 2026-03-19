@@ -437,9 +437,14 @@ input[type='range'] {
 }
 
 .prism-canvas-wrap {
+  position: relative;
   border: 1px solid var(--line);
   border-radius: 14px;
   overflow: hidden;
+}
+
+.rainbow-wrap {
+  position: relative;
 }
 
 .raytrace-wrap {
@@ -523,6 +528,23 @@ input[type='range'] {
 .refraction-corner-control span {
   font-size: 0.78rem;
   color: #ddd;
+}
+
+.rainbow-corner-control {
+  top: 0.6rem;
+  right: 0.6rem;
+  bottom: auto;
+  width: 148px;
+  padding: 0.3rem 0.4rem;
+  gap: 0.2rem;
+}
+
+.rainbow-corner-control label {
+  gap: 0.12rem;
+}
+
+.rainbow-corner-control span {
+  font-size: 0.74rem;
 }
 
 .prism-corner-control {

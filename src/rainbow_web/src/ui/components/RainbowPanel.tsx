@@ -31,65 +31,8 @@ function drawBackgroundFromImage(ctx: CanvasRenderingContext2D, img: HTMLImageEl
 }
 
 type LayerState = {
-  canvas: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
-  imageData: ImageData;
-  pixels: Uint8ClampedArray;
-  dirty: boolean;
+  drops: RainbowDropSample[];
 };
-
-function stampToLayer(layer: LayerState, drop: RainbowDropSample): void {
-  if (drop.intensity <= 0.001) {
-    return;
-  }
-
-  const chroma = Math.max(drop.r, drop.g, drop.b);
-  if (chroma <= 0) {
-    return;
-  }
-
-  const minX = Math.max(0, Math.floor(drop.x - drop.radius));
-  const maxX = Math.min(W - 1, Math.ceil(drop.x + drop.radius));
-  const minY = Math.max(0, Math.floor(drop.y - drop.radius));
-  const maxY = Math.min(H - 1, Math.ceil(drop.y + drop.radius));
-
-  for (let yy = minY; yy <= maxY; yy += 1) {
-    for (let xx = minX; xx <= maxX; xx += 1) {
-      const dx = xx + 0.5 - drop.x;
-      const dy = yy + 0.5 - drop.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist > drop.radius) {
-        continue;
-      }
-
-      const t = dist / Math.max(1e-6, drop.radius);
-      const iLift = Math.pow(
-        Math.max(0, Math.min(1, drop.intensity)),
-        UI_PARAMS.rainbow.intensityMapping.gamma,
-      );
-      const iToneBase = iLift / (1 + UI_PARAMS.rainbow.intensityMapping.compression * iLift);
-      const iTone = Math.min(1, iToneBase * UI_PARAMS.rainbow.intensityMapping.brightnessGain);
-      const a = iTone * (1 - t) * (1 - t);
-      if (a <= 0.001) {
-        continue;
-      }
-
-      const alpha = Math.max(0, Math.min(255, Math.floor(a * 255)));
-      const idx = (yy * W + xx) * 4;
-
-      // Non-additive compositing: keep the strongest droplet contribution only.
-      if (alpha <= layer.pixels[idx + 3]) {
-        continue;
-      }
-
-      layer.pixels[idx] = drop.r;
-      layer.pixels[idx + 1] = drop.g;
-      layer.pixels[idx + 2] = drop.b;
-      layer.pixels[idx + 3] = alpha;
-      layer.dirty = true;
-    }
-  }
-}
 
 function previewFillColor(r: number, g: number, b: number, intensity: number): string {
   if (intensity <= 0.001) {
@@ -108,6 +51,37 @@ function previewFillColor(r: number, g: number, b: number, intensity: number): s
   return `rgb(${rr}, ${gg}, ${bb})`;
 }
 
+function dropOpacity(intensity: number): number {
+  return Math.max(0, Math.min(0.42, intensity * 0.42));
+}
+
+function drawFallingDrop(ctx: CanvasRenderingContext2D, drop: RainbowDropSample): void {
+  const alpha = dropOpacity(drop.intensity);
+  if (alpha <= 0.01) {
+    return;
+  }
+
+  const length = UI_PARAMS.rainbow.rainDropLength * (drop.radius / UI_PARAMS.rainbow.rainDropRadius);
+  const tailY = Math.max(drop.y - length, 0);
+  const gradient = ctx.createLinearGradient(drop.x, tailY, drop.x, drop.y + drop.radius);
+  gradient.addColorStop(0, `rgba(${drop.r}, ${drop.g}, ${drop.b}, 0)`);
+  gradient.addColorStop(0.45, `rgba(${drop.r}, ${drop.g}, ${drop.b}, ${alpha * 0.5})`);
+  gradient.addColorStop(1, `rgba(${drop.r}, ${drop.g}, ${drop.b}, ${Math.min(1, alpha * 0.95)})`);
+
+  ctx.strokeStyle = gradient;
+  ctx.lineWidth = drop.radius * 1.1;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(drop.x, tailY);
+  ctx.lineTo(drop.x, drop.y + drop.radius * 0.35);
+  ctx.stroke();
+
+  ctx.fillStyle = `rgba(${drop.r}, ${drop.g}, ${drop.b}, ${Math.min(1, alpha)})`;
+  ctx.beginPath();
+  ctx.arc(drop.x, drop.y, drop.radius, 0, Math.PI * 2);
+  ctx.fill();
+}
+
 export function RainbowPanel() {
   const text = UI_TEXT.modules.rainbow;
   const [ui, setUi] = useState(sim.uiState());
@@ -120,21 +94,8 @@ export function RainbowPanel() {
   const bgImageRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
-    const layer = document.createElement('canvas');
-    layer.width = W;
-    layer.height = H;
-    const lctx = layer.getContext('2d');
-    if (!lctx) {
-      return undefined;
-    }
-
-    const imageData = lctx.createImageData(W, H);
     layerRef.current = {
-      canvas: layer,
-      ctx: lctx,
-      imageData,
-      pixels: imageData.data,
-      dirty: false,
+      drops: [],
     };
 
     const img = new Image();
@@ -148,25 +109,25 @@ export function RainbowPanel() {
 
     const raf = { id: 0 };
     let lastUi = 0;
+    let lastTs = 0;
 
     const draw = (ts: number) => {
-      const rain = sim.rainTick();
       const layerState = layerRef.current;
+      const deltaMs = lastTs > 0 ? ts - lastTs : 16.67;
+      lastTs = ts;
+
       if (layerState) {
-        for (const d of rain) {
-          stampToLayer(layerState, d);
-        }
-        if (layerState.dirty) {
-          layerState.ctx.putImageData(layerState.imageData, 0, 0);
-          layerState.dirty = false;
-        }
+        layerState.drops = sim.rainTick(deltaMs);
       }
 
       const canvas = canvasRef.current;
       const ctx = canvas?.getContext('2d');
       if (ctx && layerState) {
         drawBackgroundFromImage(ctx, bgImageRef.current);
-        ctx.drawImage(layerState.canvas, 0, 0);
+
+        for (const drop of layerState.drops) {
+          drawFallingDrop(ctx, drop);
+        }
 
         const preview = previewRef.current;
         if (preview) {
@@ -208,11 +169,7 @@ export function RainbowPanel() {
     const d = sim.manualDrop(x, y, boost);
     const layerState = layerRef.current;
     if (d && layerState) {
-      stampToLayer(layerState, d);
-      if (layerState.dirty) {
-        layerState.ctx.putImageData(layerState.imageData, 0, 0);
-        layerState.dirty = false;
-      }
+      layerState.drops = [...layerState.drops, d];
       setUi(sim.uiState());
     }
   };
@@ -222,38 +179,7 @@ export function RainbowPanel() {
       <h2>{text.title}</h2>
       <p className="panel-lead">{text.lead}</p>
 
-      <div className="controls">
-        <div className="mode-row">
-          <button
-            type="button"
-            className={ui.simulating ? 'mode-btn active' : 'mode-btn'}
-            onClick={() => {
-              sim.toggleSimulating();
-              setUi(sim.uiState());
-            }}
-          >
-            {ui.simulating ? text.stopRain : text.startRain}
-          </button>
-          <button
-            type="button"
-            className="mode-btn"
-            onClick={() => {
-              sim.clear();
-              const layerState = layerRef.current;
-              if (layerState) {
-                layerState.pixels.fill(0);
-                layerState.ctx.putImageData(layerState.imageData, 0, 0);
-                layerState.dirty = false;
-              }
-              setUi(sim.uiState());
-            }}
-          >
-            {text.clear}
-          </button>
-        </div>
-      </div>
-
-      <div className="prism-canvas-wrap">
+      <div className="prism-canvas-wrap rainbow-wrap">
         <canvas
           ref={canvasRef}
           className={isDragging ? 'prism-canvas drag-hidden-cursor' : 'prism-canvas'}
@@ -290,22 +216,23 @@ export function RainbowPanel() {
             setIsDragging(false);
             previewRef.current = null;
           }}
-          aria-label="Rainbow field accumulation"
+          aria-label="Animated falling rainbow rain"
         />
-      </div>
-
-      <div className="stats">
-        <div>
-          <span>{text.drops}</span>
-          <strong>{ui.totalPoints.toLocaleString()}</strong>
-        </div>
-        <div>
-          <span>{text.rate}</span>
-          <strong>{ui.simulating ? Math.floor(ui.pointsPerFrame) : 0}{text.frameSuffix}</strong>
-        </div>
-        <div>
-          <span>{text.manualInput}</span>
-          <strong>{text.manualHint}</strong>
+        <div className="refraction-corner-control rainbow-corner-control">
+          <label>
+            <span>{text.rainIntensity}</span>
+            <input
+              type="range"
+              min={UI_PARAMS.rainbow.rainIntensityRange.min}
+              max={UI_PARAMS.rainbow.rainIntensityRange.max}
+              step={UI_PARAMS.rainbow.rainIntensityRange.step}
+              value={ui.rainIntensity}
+              onChange={(e) => {
+                sim.setRainIntensity(Number(e.target.value));
+                setUi(sim.uiState());
+              }}
+            />
+          </label>
         </div>
       </div>
     </section>

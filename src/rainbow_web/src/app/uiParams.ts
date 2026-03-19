@@ -60,10 +60,14 @@ export const UI_PARAMS = {
     canvasWidth: 1000,
     canvasHeight: 560,
     defaults: {
-      pointsPerFrame: 100,
+      rainIntensity: 0,
+      spawnRateAtMax: 10000,
       acceleration: 1.012,
-      maxPoints: 9000,
+      maxPoints: 10000,
+      dropFallSpeed: 150,
+      maxActiveDrops: 100000,
     },
+    rainIntensityRange: { min: 0, max: 100, step: 1 },
     intensityThreshold: 0.0001,
     intensityMapping: {
       gamma: 0.72,
@@ -71,10 +75,11 @@ export const UI_PARAMS = {
       brightnessGain: 1.2,
     },
     manualDropRadius: {
-      normal: 8.4,
-      boosted: 10.5,
+      normal: 6,
+      boosted: 7.6,
     },
     previewRadius: 8,
-    rainDropRadius: 1.35,
+    rainDropRadius: 2.6,
+    rainDropLength: 10,
   },
 } as const;
