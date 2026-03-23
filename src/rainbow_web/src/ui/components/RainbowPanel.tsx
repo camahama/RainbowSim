@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { RainbowSimulation, type RainbowDropSample } from '../../simulations/rainbow/rainbowSimulation';
-import { UI_TEXT } from '../../app/uiText';
+import { useUiText } from '../../app/i18n';
 import { UI_PARAMS } from '../../app/uiParams';
+import { SimulationHeader } from './SimulationHeader';
 
 const sim = new RainbowSimulation();
 const W = UI_PARAMS.rainbow.canvasWidth;
@@ -83,7 +84,7 @@ function drawFallingDrop(ctx: CanvasRenderingContext2D, drop: RainbowDropSample)
 }
 
 export function RainbowPanel() {
-  const text = UI_TEXT.modules.rainbow;
+  const text = useUiText().modules.rainbow;
   const [ui, setUi] = useState(sim.uiState());
   const [isDragging, setIsDragging] = useState(false);
 
@@ -176,8 +177,7 @@ export function RainbowPanel() {
 
   return (
     <section className="panel">
-      <h2>{text.title}</h2>
-      <p className="panel-lead">{text.lead}</p>
+      <SimulationHeader title={text.title} lead={text.lead} />
 
       <div className="prism-canvas-wrap rainbow-wrap">
         <canvas
@@ -216,7 +216,7 @@ export function RainbowPanel() {
             setIsDragging(false);
             previewRef.current = null;
           }}
-          aria-label="Animated falling rainbow rain"
+          aria-label={text.canvasAria}
         />
         <div className="refraction-corner-control rainbow-corner-control">
           <label>

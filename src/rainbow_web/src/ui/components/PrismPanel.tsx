@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { PrismSimulation } from '../../simulations/prism/prismSimulation';
 import type { PrismMode, Vec2 } from '../../physics/prism/engine';
-import { UI_TEXT } from '../../app/uiText';
+import { translateSpectrumColor } from '../../app/uiText';
+import { useUiText } from '../../app/i18n';
 import { UI_PARAMS } from '../../app/uiParams';
+import { SimulationHeader } from './SimulationHeader';
 
 const sim = new PrismSimulation();
 
@@ -90,7 +92,8 @@ function totalTravelTime(points: Vec2[], speedAir: number, speedMedium: number, 
 }
 
 export function PrismPanel() {
-  const text = UI_TEXT.modules.prism;
+  const uiText = useUiText();
+  const text = uiText.modules.prism;
   const [mode, setMode] = useState<PrismMode>(sim.getState().mode);
   const [incidentDeg, setIncidentDeg] = useState<number>(sim.getState().incidentDeg);
   const [colorSeparation, setColorSeparation] = useState<number>(sim.getState().colorSeparation);
@@ -151,11 +154,10 @@ export function PrismPanel() {
 
   return (
     <section className="panel prism-panel">
-      <h2>{text.title}</h2>
-      <p className="panel-lead">{text.lead}</p>
+      <SimulationHeader title={text.title} lead={text.lead} />
 
       <div className="controls prism-controls">
-        <div className="mode-row" role="group" aria-label="Prism mode controls">
+        <div className="mode-row" role="group" aria-label={text.controlsAria}>
           <button
             type="button"
             className="mode-btn"
@@ -230,7 +232,7 @@ export function PrismPanel() {
       <p className="mode-description">{description}</p>
 
       <div className="prism-canvas-wrap prism-wrap">
-        <svg viewBox="0 0 1000 460" className="prism-canvas" role="img" aria-label="Prism ray tracing visualization">
+        <svg viewBox="0 0 1000 460" className="prism-canvas" role="img" aria-label={text.canvasAria}>
           <rect x="0" y="0" width="1000" height="460" fill="#0a0f14" />
 
           {started && snapshot.polygon.length > 0 ? (
@@ -307,7 +309,7 @@ export function PrismPanel() {
           <div key={ray.band.name} className="legend-item">
             <span className="swatch" style={{ backgroundColor: ray.band.color }} />
             <span>
-              {ray.band.name} {text.legendNPrefix}{ray.band.n.toFixed(2)}
+              {translateSpectrumColor(uiText, ray.band.name)} {text.legendNPrefix}{ray.band.n.toFixed(2)}
             </span>
           </div>
         ))}

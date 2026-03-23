@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
 import { RAINBOW_BANDS } from '../../physics/droplet/engine';
 import { DropletSimulation } from '../../simulations/droplet/dropletSimulation';
-import { UI_TEXT } from '../../app/uiText';
+import { translateSpectrumColor } from '../../app/uiText';
+import { useUiText } from '../../app/i18n';
 import { UI_PARAMS } from '../../app/uiParams';
+import { SimulationHeader } from './SimulationHeader';
 
 const sim = new DropletSimulation();
 
@@ -11,7 +13,8 @@ function toPolyline(points: { x: number; y: number }[]): string {
 }
 
 export function DropletPanel() {
-  const text = UI_TEXT.modules.droplet;
+  const uiText = useUiText();
+  const text = uiText.modules.droplet;
   const initial = sim.getState();
 
   const [visible, setVisible] = useState<boolean[]>(initial.visible);
@@ -73,8 +76,7 @@ export function DropletPanel() {
 
   return (
     <section className="panel">
-      <h2>{text.title}</h2>
-      <p className="panel-lead">{text.lead}</p>
+      <SimulationHeader title={text.title} lead={text.lead} />
 
       <div className="droplet-layout">
         <div className="prism-canvas-wrap">
@@ -212,7 +214,7 @@ export function DropletPanel() {
                     }
                   }}
                 >
-                  {band.name}
+                  {translateSpectrumColor(uiText, band.name)}
                 </button>
               </div>
             ))}
@@ -250,7 +252,7 @@ export function DropletPanel() {
       <div className="stats">
         <div>
           <span>{text.focusedColor}</span>
-          <strong>{RAINBOW_BANDS[focusedIndex].name}</strong>
+          <strong>{translateSpectrumColor(uiText, RAINBOW_BANDS[focusedIndex].name)}</strong>
         </div>
         <div>
           <span>{text.primaryDeflection}</span>

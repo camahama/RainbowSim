@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { RaytraceSimulation } from '../../simulations/raytrace/raytraceSimulation';
-import { UI_TEXT } from '../../app/uiText';
+import { useUiText } from '../../app/i18n';
 import { UI_PARAMS } from '../../app/uiParams';
+import { SimulationHeader } from './SimulationHeader';
 
 const sim = new RaytraceSimulation();
 
@@ -10,7 +11,7 @@ function intensityToOpacity(intensity: number): number {
 }
 
 export function RaytracePanel() {
-  const text = UI_TEXT.modules.raytrace;
+  const text = useUiText().modules.raytrace;
   const [sourceXOffset, setSourceXOffset] = useState(sim.getState().sourceXOffset);
   const [radius, setRadius] = useState(sim.getState().radius);
   const [dragging, setDragging] = useState(false);
@@ -29,8 +30,7 @@ export function RaytracePanel() {
 
   return (
     <section className="panel">
-      <h2>{text.title}</h2>
-      <p className="panel-lead">{text.lead}</p>
+      <SimulationHeader title={text.title} lead={text.lead} />
 
       <div className="controls">
         <p className="panel-lead" style={{ margin: 0 }}>{text.dragHint}</p>

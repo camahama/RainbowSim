@@ -1,9 +1,11 @@
 import type { SimulationId } from '../../app/registry';
 import { SIMULATION_IDS } from '../../app/registry';
-import { UI_TEXT } from '../../app/uiText';
+import { UI_TEXT, type Language } from '../../app/uiText';
 
 type MasterMenuProps = {
   activeId: SimulationId | null;
+  language: Language;
+  onLanguageChange: (language: Language) => void;
   onPick: (id: SimulationId) => void;
 };
 
@@ -108,26 +110,49 @@ function MenuIcon({ id }: MenuIconProps) {
   );
 }
 
-export function MasterMenu({ activeId, onPick }: MasterMenuProps) {
+export function MasterMenu({ activeId, language, onLanguageChange, onPick }: MasterMenuProps) {
+  const text = UI_TEXT[language];
+
   return (
-    <section className="menu-grid" aria-label={UI_TEXT.appSubtitle}>
-      {SIMULATION_IDS.map((id) => {
-        const active = id === activeId;
-        return (
+    <>
+      <div className="menu-toolbar">
+        <div className="language-toggle" role="group" aria-label={text.languageLabel}>
           <button
-            key={id}
             type="button"
-            className={`menu-card ${active ? 'active' : ''}`}
-            onClick={() => onPick(id)}
-            aria-current={active ? 'true' : undefined}
+            className={language === 'sv' ? 'language-btn active' : 'language-btn'}
+            onClick={() => onLanguageChange('sv')}
           >
-            <span className={`menu-icon-wrap menu-icon-${id}`}>
-              <MenuIcon id={id} />
-            </span>
-            <span className="menu-card-label">{UI_TEXT.moduleButtons[id]}</span>
+            {text.languageSwitch.sv}
           </button>
-        );
-      })}
-    </section>
+          <button
+            type="button"
+            className={language === 'en' ? 'language-btn active' : 'language-btn'}
+            onClick={() => onLanguageChange('en')}
+          >
+            {text.languageSwitch.en}
+          </button>
+        </div>
+      </div>
+
+      <section className="menu-grid" aria-label={text.menuAriaLabel}>
+        {SIMULATION_IDS.map((id) => {
+          const active = id === activeId;
+          return (
+            <button
+              key={id}
+              type="button"
+              className={`menu-card ${active ? 'active' : ''}`}
+              onClick={() => onPick(id)}
+              aria-current={active ? 'true' : undefined}
+            >
+              <span className={`menu-icon-wrap menu-icon-${id}`}>
+                <MenuIcon id={id} />
+              </span>
+              <span className="menu-card-label">{text.moduleButtons[id]}</span>
+            </button>
+          );
+        })}
+      </section>
+    </>
   );
 }

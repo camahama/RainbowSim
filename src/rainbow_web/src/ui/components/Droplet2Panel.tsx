@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { DROPLET2_BANDS } from '../../physics/droplet2/engine';
 import { Droplet2Simulation } from '../../simulations/droplet2/droplet2Simulation';
-import { UI_TEXT } from '../../app/uiText';
+import { useUiText } from '../../app/i18n';
 import { UI_PARAMS } from '../../app/uiParams';
+import { SimulationHeader } from './SimulationHeader';
 
 const sim = new Droplet2Simulation();
 
@@ -39,7 +40,7 @@ function drawRay(
 }
 
 export function Droplet2Panel() {
-  const text = UI_TEXT.modules.droplet2;
+  const text = useUiText().modules.droplet2;
   const [ui, setUi] = useState(sim.uiState());
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -168,11 +169,10 @@ export function Droplet2Panel() {
 
   return (
     <section className="panel">
-      <h2>{text.title}</h2>
-      <p className="panel-lead">{text.lead}</p>
+      <SimulationHeader title={text.title} lead={text.lead} />
 
       <div className="controls">
-        <div className="mode-row" role="group" aria-label="Droplet2 controls">
+        <div className="mode-row" role="group" aria-label={text.controlsAria}>
           <button
             type="button"
             className={ui.primaryVisible ? 'mode-btn active' : 'mode-btn'}
@@ -204,7 +204,7 @@ export function Droplet2Panel() {
           className="prism-canvas"
           width={SCENE_W}
           height={SCENE_H}
-          aria-label="Animated droplet accumulation"
+          aria-label={text.canvasAria}
         />
 
         <div className="droplet2-corner-control">

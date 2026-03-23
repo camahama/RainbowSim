@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { UI_TEXT } from '../../app/uiText';
+import { useUiText } from '../../app/i18n';
 import { UI_PARAMS } from '../../app/uiParams';
+import { SimulationHeader } from './SimulationHeader';
 
 const VIEW_W = UI_PARAMS.refraction.viewWidth;
 const VIEW_H = UI_PARAMS.refraction.viewHeight;
@@ -37,7 +38,7 @@ function degToRad(deg: number): number {
 }
 
 export function RefractionPanel() {
-  const text = UI_TEXT.modules.refraction;
+  const text = useUiText().modules.refraction;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const lastTsRef = useRef<number | null>(null);
   const phaseRef = useRef(0);
@@ -216,8 +217,7 @@ export function RefractionPanel() {
 
   return (
     <section className="panel refraction-panel">
-      <h2>{text.title}</h2>
-      <p className="panel-lead">{text.lead}</p>
+      <SimulationHeader title={text.title} lead={text.lead} />
 
       <div className="prism-canvas-wrap refraction-wrap">
         <canvas
@@ -226,7 +226,7 @@ export function RefractionPanel() {
           width={VIEW_W}
           height={VIEW_H}
           role="img"
-          aria-label="Refraction wavefield visualization"
+          aria-label={text.canvasAria}
         />
 
         <div className="refraction-corner-control">
